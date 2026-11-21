@@ -95,3 +95,7 @@ pnpm dsh web --patch /Users/leiyu/学科实践大作业/plugin/cordis.yml
 - 启动：`pnpm dsh web --patch /Users/leiyu/学科实践大作业/plugin/cordis.yml`，启动日志出现 `[paper-navigator] plugin loaded, greet tool registered`。
 - 对话输入「请使用 greet 工具向 Ada 打个招呼」，模型调用工具并回显工具返回值；用量 19.8K tok，263 tok/s。
 - `dsh` 实为源码直跑（根 package.json 的 `"dsh"` 脚本用 tsx 加载 `apps/cli/src/bin.ts`），`pnpm run build` 的产物供 web profile 使用；构建 98 秒完成（10 个 gate 全部 PASS）。
+
+## 后续方向：原生插件化（毕设提案）
+
+当前是演示形态（`--patch` 手工挂载 + 本机 profile 管模型路由）。原生化路径已成正式提案：[docs/native-plugin-roadmap.md](docs/native-plugin-roadmap.md)——打包成 dsh bundle，自带工具/技能/智谱模型路由，用户侧 `dsh plugin add` 一条命令 + 填自己的 API Key 即可用。这是把本项目延伸为毕业设计的首选方向。
