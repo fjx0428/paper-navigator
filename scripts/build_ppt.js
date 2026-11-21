@@ -107,21 +107,23 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
 /* ---------- 4 四个工具与笔记结构 ---------- */
 {
   const s = pres.addSlide()
-  pageHeader(s, 'DESIGN', '四个确定性工具与冻结的笔记结构')
+  pageHeader(s, 'DESIGN', '六个确定性工具与冻结的笔记结构')
   const tools = [
+    ['search_arxiv', '研究主题 → arXiv 检索结果（编号 + 标题）'],
     ['fetch_arxiv', 'arXiv id → 标题/作者/摘要 + 下载 PDF、抽取章节'],
     ['list_sections', '→ 章节目录（标题、页码、词数）'],
     ['read_section', '章节序号 + max_chars → 该节正文（进入校验语料）'],
     ['write_note', '笔记 JSON → 校验通过落盘；否则整体退回'],
+    ['compare_notes', '多篇已落盘笔记 → 方法/指标/局限对照表'],
   ]
-  let y = 1.8
+  let y = 1.72
   for (const [t, d] of tools) {
-    s.addText(t, { x: M, y, w: 2.2, h: 0.62, fontSize: 16.5, bold: true, color: PRIMARY_DK, fontFace: 'SF Mono', margin: 0 })
-    s.addText(d, { x: 2.85, y, w: 4.6, h: 0.62, fontSize: 13.5, color: TEXT, fontFace: FONT, margin: 0 })
-    y += 0.78
-    rule(s, M, y - 0.16, 7.0)
+    s.addText(t, { x: M, y, w: 2.2, h: 0.56, fontSize: 15, bold: true, color: PRIMARY_DK, fontFace: 'SF Mono', margin: 0 })
+    s.addText(d, { x: 2.85, y, w: 4.6, h: 0.56, fontSize: 12.5, color: TEXT, fontFace: FONT, margin: 0 })
+    y += 0.62
+    rule(s, M, y - 0.14, 7.0)
   }
-  s.addText('模型只决定何时调用、传什么参数；工具行为完全确定、可测试（25 个单元测试）。', { x: M, y: 5.1, w: 6.9, h: 0.8, fontSize: 14, color: MUTED, fontFace: FONT, margin: 0 })
+  s.addText('模型只决定何时调用、传什么参数；工具行为完全确定、可测试（25 个单元测试）。', { x: M, y: 5.62, w: 6.9, h: 0.8, fontSize: 14, color: MUTED, fontFace: FONT, margin: 0 })
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 7.75, y: 1.75, w: 5.05, h: 4.9, fill: { color: '11141B' }, rectRadius: 0.09 })
   s.addText([
     { text: '{', options: { breakLine: true } },
@@ -173,20 +175,21 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
     ['逐字包含', 'quote 与语料各自只合并空白字符后必须逐字命中——改一个数字、换一个 Unicode 变体都过不去'],
     ['最小长度', '引用 ≥ 8 字符，碎片化的「碰巧命中」不算依据'],
     ['整体退回', '任何一条不通过，整份笔记退回；模型按逐条错误清单补读或修正后重交'],
+    ['引用定位', '通过的每条引用标注「来源：§章节，第 N 页」，可直接翻回原文核对'],
   ]
-  let y = 2.45
+  let y = 2.3
   for (const [t, d] of rules) {
-    s.addText(t, { x: M, y, w: 1.8, h: 0.75, fontSize: 16, bold: true, color: ACCENT, fontFace: FONT, margin: 0 })
-    s.addText(d, { x: 2.5, y, w: 10.2, h: 0.75, fontSize: 14.5, color: TEXT, fontFace: FONT, margin: 0 })
-    y += 0.88
-    rule(s, M, y - 0.24, W - 2 * M)
+    s.addText(t, { x: M, y, w: 1.8, h: 0.62, fontSize: 15, bold: true, color: ACCENT, fontFace: FONT, margin: 0 })
+    s.addText(d, { x: 2.5, y, w: 10.2, h: 0.62, fontSize: 13.5, color: TEXT, fontFace: FONT, margin: 0 })
+    y += 0.74
+    rule(s, M, y - 0.2, W - 2 * M)
   }
-  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: M, y: 5.2, w: W - 2 * M, h: 1.5, fill: { color: '11141B' }, rectRadius: 0.09 })
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: M, y: 5.35, w: W - 2 * M, h: 1.4, fill: { color: '11141B' }, rectRadius: 0.09 })
   s.addText([
     { text: '[write_note] 引用校验未通过（2 条问题），笔记未写入：', options: { breakLine: true, color: 'FF9E7A' } },
     { text: '1. metrics[0]：「The LoRA method achieves 99.9% accuracy …」—— 找不到这句', options: { breakLine: true, color: 'D7DEED' } },
     { text: '2. method.quotes[1]：「… so ∆W = BA is zero …」—— 找不到（∆ 与原文 Δ 字符不一致）', options: { color: 'D7DEED' } },
-  ], { x: M + 0.3, y: 5.42, w: W - 2 * M - 0.6, h: 1.1, fontSize: 13, fontFace: 'SF Mono', margin: 0, paraSpaceAfter: 4 })
+  ], { x: M + 0.3, y: 5.52, w: W - 2 * M - 0.6, h: 1.1, fontSize: 12.5, fontFace: 'SF Mono', margin: 0, paraSpaceAfter: 4 })
   foot(s, 6)
 }
 
@@ -292,9 +295,9 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
   const steps = [
     ['1', '克隆 Harness（浅克隆）并锁 commit 2e39e704；pnpm install（慢网用 npmmirror）'],
     ['2', 'pnpm run build —— 约 2 分钟'],
-    ['3', 'pnpm dsh web --patch /绝对路径/plugin/cordis.yml'],
-    ['4', '网页对话：「阅读 arXiv:1706.03762，按 paper 技能产出笔记」'],
-    ['5', '复跑评测：node --import tsx eval/run_eval.ts && node --import tsx eval/render_results.ts'],
+    ['3', '环境变量：DEEPSEEK_API_KEY（DeepSeek）或 ZAI_CODING_CN_API_KEY（智谱 GLM），双模型已验证'],
+    ['4', 'pnpm dsh web --patch /绝对路径/plugin/cordis.yml（patch 同时把默认模型切到智谱）'],
+    ['5', '网页对话产出笔记；评测复跑：node --import tsx eval/run_eval.ts'],
   ]
   let y = 1.8
   for (const [n, d] of steps) {
@@ -305,7 +308,7 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
   }
   s.addText([
     { text: '仓库结构：', options: { bold: true } },
-    { text: 'plugin/（cordis.yml + 4 工具 + 技能，依赖 link: 指向本地 Harness 工作区包） · eval/（papers.jsonl、run_eval.ts、轨迹） · notes/（产出的笔记） · site/（本展示网站） · docs/', options: { color: MUTED } },
+    { text: 'plugin/（cordis.yml + 6 工具 + 技能，依赖 link: 指向本地 Harness 工作区包） · eval/（papers.jsonl、run_eval.ts、轨迹） · notes/（产出的笔记） · site/（展示网站 + 笔记库） · docs/', options: { color: MUTED } },
   ], { x: M, y: 5.85, w: W - 2 * M, h: 0.9, fontSize: 13.5, fontFace: FONT, margin: 0 })
   foot(s, 10)
 }
@@ -315,8 +318,8 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
   const s = pres.addSlide()
   pageHeader(s, 'NEXT', '可以继续做成毕业设计的部分')
   const cols = [
-    ['更严的评测', '扩大论文池与模型池（DeepSeek V4.1 / R1 等）；引用核对从「子串命中」升级为语义蕴含判定；加摘要对照组的多种提示强度'],
-    ['更好的章节检索', '目录选读 → 混合检索（BM25 + 向量）定位证据段落；跨节证据聚合；公式与表格的结构化抽取'],
+    ['原生插件化', '打包成 dsh bundle：自带工具/技能/智谱路由配置，dsh plugin add 一条命令安装，用户只填自己的 API Key。路线图见 docs/native-plugin-roadmap.md'],
+    ['更严的评测', '扩大论文池与模型池（DeepSeek / GLM / R1 等）；引用核对从「子串命中」升级为语义蕴含判定；加摘要对照组的多种提示强度'],
     ['复现实验清单', '对一篇论文生成「数据 / 命令 / 期望指标」清单，并用工具链核对每个期望指标确实出自论文'],
   ]
   cols.forEach(([t, d], i) => {
@@ -334,9 +337,9 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
   s.background = { color: BG_DARK }
   s.addText('总结', { x: M, y: 0.7, w: 6, h: 0.9, fontSize: 40, bold: true, color: 'FFFFFF', fontFace: FONT, margin: 0 })
   const rows = [
-    ['做成了', '一个可用的 Agent 产品 Demo：挂载于 Harness 的论文阅读插件，四个工具 + 技能 + 引用校验，网页一句话到笔记落盘'],
-    ['证明了', '带工具与引用校验的笔记，其每条依据都能被机械验证；编造的指标会被退回——摘要对照组给出了对照数字'],
-    ['留下了', '可复现的评测集与轨迹、25 个单元测试、展示网站与本文档；下一阶段可做语义级校验与检索式精读'],
+    ['做成了', '一个可用的 Agent 产品 Demo：挂载于 Harness 的论文阅读插件，六个工具 + 技能 + 引用校验，网页一句话到笔记落盘，公网笔记库与评测全部在线'],
+    ['证明了', '带工具与引用校验的笔记，每条依据都能被机械验证，编造指标会被退回——摘要对照组给出对照数字；同一插件在 DeepSeek 与智谱 GLM 双模型上均跑通'],
+    ['留下了', '可复现的评测集与轨迹、25 个单元测试、公网笔记库与评测、展示网站与本文档；下一阶段可做语义级校验与检索式精读'],
   ]
   let y = 1.9
   for (const [t, d] of rows) {
