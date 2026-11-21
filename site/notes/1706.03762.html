@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attention Is All You Need · 论文领航笔记</title>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="notes.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="../index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../architecture.html">架构</a>
+    <a href="../demo.html">演示</a>
+    <a href="index.html" class="active">笔记</a>
+    <a href="../eval.html">评测</a>
+    <a href="../run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>Attention Is All You Need</h1>
+  <p class="lead">arXiv:<a href="https://arxiv.org/abs/1706.03762">1706.03762</a> · 由论文领航插件自动生成，全部引用经 write_note 逐字校验（仅合并空白）</p>
+  <section class="note-sec"><h2>问题</h2><p>序列转导任务的主流做法是编码器-解码器结构的循环或卷积神经网络，其中 RNN 按符号位置逐步展开隐藏状态，这种固有的时序性使单个训练样本内部无法并行，序列越长越受显存与批大小限制。注意力机制通常只是与循环网络配合使用的辅助组件。本文的问题是：能否完全去掉循环与卷积，仅靠注意力在输入输出之间建立全局依赖，同时获得更好的翻译质量和更高的训练并行度。</p><h3>原文依据</h3>
+<blockquote>The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration.</blockquote>
+<blockquote>We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.</blockquote>
+<blockquote>This inherently sequential nature precludes parallelization within training examples</blockquote></section>
+  <section class="note-sec"><h2>方法</h2><p>Transformer 由 6 层编码器与 6 层解码器堆叠而成，每层以多头自注意力加逐位置全连接前馈网络为核心，并采用残差连接加层归一化；解码器额外插入对编码器输出的注意力，并用掩码保证自回归性质。核心算子是缩放点积注意力 softmax(QK^T/√d_k)V，多头机制用 h=8 组独立线性投影在不同于空间并行做注意力再拼接，总计算量与全维单头相当。模型用正弦余弦位置编码注入顺序信息，并在嵌入层与 pre-softmax 线性层之间共享权重矩阵。</p><h3>原文依据</h3>
+<blockquote>The encoder is composed of a stack of N = 6 identical layers.</blockquote>
+<blockquote>In this work we employ h = 8 parallel attention layers, or heads.</blockquote>
+<blockquote>Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions.</blockquote>
+<blockquote>In this work, we use sine and cosine functions of different frequencies</blockquote></section>
+  <section class="note-sec"><h2>数据</h2><p>机器翻译实验使用 WMT 2014 英德（约 450 万句对，共享约 37000 的 BPE 词表）与英法（3600 万句，32000 word-piece 词表）数据集，按长度分桶，每批约 25000 源端与 25000 目标端 token。训练在单机 8 块 NVIDIA P100 上完成：base 模型 10 万步约 12 小时，big 模型 30 万步约 3.5 天。为验证泛化性，作者另在 Penn Treebank 的 WSJ 子集（约 4 万句）上做英语成分句法分析，并在约 1700 万句的半监督语料上训练。</p><h3>原文依据</h3>
+<blockquote>We trained on the standard WMT 2014 English-German dataset consisting of about 4.5 million sentence pairs.</blockquote>
+<blockquote>For English-French, we used the significantly larger WMT 2014 English-French dataset consisting of 36M sentences and split tokens into a 32000 word-piece vocabulary</blockquote>
+<blockquote>We trained our models on one machine with 8 NVIDIA P100 GPUs.</blockquote>
+<blockquote>We trained a 4-layer transformer with dmodel = 1024 on the Wall Street Journal (WSJ) portion of the Penn Treebank</blockquote></section>
+  <section class="note-sec"><h2>指标</h2>
+  <table><tr><th>指标</th><th>数值</th><th>原文依据</th></tr>
+  <tr><td>WMT 2014 EN-DE BLEU (big)</td><td><b>28.4</b></td><td>establishing a new state-of-the-art BLEU score of 28.4</td></tr>
+<tr><td>WMT 2014 EN-FR BLEU (single model)</td><td><b>41.8</b></td><td>our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs</td></tr>
+<tr><td>WSJ Section 23 F1 (4-layer, semi-supervised)</td><td><b>92.7</b></td><td>Transformer (4 layers) semi-supervised 92.7</td></tr>
+<tr><td>Base model training steps / time</td><td><b>100,000 steps, 12 hours</b></td><td>We trained the base models for a total of 100,000 steps or 12 hours.</td></tr>
+  </table></section>
+  <section class="note-sec"><h2>局限</h2><p>自注意力每层复杂度为 O(n^2·d)，序列很长时计算与显存开销随长度平方增长，作者只是提出可把注意力限制在大小为 r 的邻域并留作未来工作。验证范围集中在机器翻译与英语成分句法分析两类任务，句法分析上仍未超过 Recurrent Neural Network Grammar，且文本之外的模态尚未实验。原文也没有报告多次运行的方差或对超参（层数、头数、dropout）之外因素的鲁棒性分析。</p><h3>原文依据</h3>
+<blockquote>To improve computational performance for tasks involving very long sequences, self-attention could be restricted to considering only a neighborhood of size r in the input sequence centered around the respective output position.</blockquote>
+<blockquote>We plan to extend the Transformer to problems involving input and output modalities other than text and to investigate local, restricted attention mechanisms to efficiently handle large inputs and outputs such as images, audio and video.</blockquote>
+<blockquote>yielding better results than all previously reported models with the exception of the Recurrent Neural Network Grammar [8].</blockquote></section>
+  <p><a href="index.html">← 返回笔记库</a> · <a href="https://arxiv.org/pdf/1706.03762">原文 PDF ↗</a></p>
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · <a href="https://github.com/fjx0428/paper-navigator">GitHub</a> · <a href="https://paper-navigator-2m06.zai.site">在线演示说明</a></footer>
+</main>
+</body>
+</html>

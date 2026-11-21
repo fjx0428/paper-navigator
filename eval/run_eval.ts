@@ -14,6 +14,7 @@
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
+import { hayHasFactToken } from './factMatch.ts'
 
 const ROOT = '/Users/leiyu/学科实践大作业'
 const HARNESS = join(ROOT, 'deepseek-harness')
@@ -144,7 +145,7 @@ async function main() {
       .filter(t => !STOP.has(t))
   }
   function factCheck(note: Record<string, unknown> | undefined, facts: EvalPaper['facts']): { matched: number; total: number; misses: string[] } {
-    const hay = note ? normalizeWs(noteText(note)).toLowerCase() : ''
+    const hay = note ? normalizeWs(noteText(note)) : ''
     let matched = 0
     const misses: string[] = []
     let total = 0
@@ -152,7 +153,7 @@ async function main() {
       const tokens = factTokens(fact.check)
       total += tokens.length
       for (const t of tokens) {
-        if (hay.includes(t)) matched++
+        if (hay && hayHasFactToken(hay, t)) matched++
         else misses.push(`${fact.field}:${t}`)
       }
     }

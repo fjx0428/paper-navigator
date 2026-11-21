@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vision-Based Agile Landing on Turbulent Waters · 论文领航笔记</title>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="notes.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="../index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../architecture.html">架构</a>
+    <a href="../demo.html">演示</a>
+    <a href="index.html" class="active">笔记</a>
+    <a href="../eval.html">评测</a>
+    <a href="../run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>Vision-Based Agile Landing on Turbulent Waters</h1>
+  <p class="lead">arXiv:<a href="https://arxiv.org/abs/2605.23717">2605.23717</a> · 由论文领航插件自动生成，全部引用经 write_note 逐字校验（仅合并空白）</p>
+  <section class="note-sec"><h2>问题</h2><p>多旋翼在海上船只降落时，机体与平台同时运动、运动强耦合，是典型的困难场景；传统做法需要在部署时检测并预测平台运动（如视觉标记或平台状态估计），已有工作依赖显式平台状态。本文目标是只用无人机自身状态与降落面上的局部视觉特征，在部署阶段不做平台状态的显式观测或估计，也能快速完成降落。作者声称这是首个在湍流海况下不依赖显式平台状态的敏捷海上降落方法。</p><h3>原文依据</h3>
+<blockquote>Autonomous landing of Unmanned Aerial Vehicles on maritime vessels is challenging due to the coupled motion of the vehicle and landing platform in open-sea conditions.</blockquote>
+<blockquote>This paper presents a reinforcement-learning-based approach for autonomous multirotor landing on moving maritime platforms without requiring explicit platform-state observations or estimation during deployment.</blockquote>
+<blockquote>To the best of our knowledge, this is the first approach for agile multirotor landing on maritime platforms in turbulent waters that does not rely on an explicit platform-state during deployment.</blockquote></section>
+  <section class="note-sec"><h2>方法</h2><p>把降落建模为 POMDP，策略直接把「当前/上一帧稀疏关键点+描述子、机体状态、上一动作」映射为姿态与推力指令，交给常规底层姿态控制器跟踪，部署时不观测也不估计平台状态。视觉端不用分割掩码或原始 RGB，而是用 SRPose 稀疏关键点编码器，描述子先做 L2 归一化，使匹配先验取决于方向而非幅值。训练时用合成关键点与随机生成的归一化描述子替代真实特征提取器，因此同一策略可零样本对接 SURF、A-KAZE 等不同提取器；策略为高斯 actor-critic（actor/critic 各为两层 512 单元 tanh MLP），在 Aerial Gym 中用 PPO 训练，并配合从静止平台起步的课程学习与 20% 描述子随机丢弃来提升鲁棒性。</p><h3>原文依据</h3>
+<blockquote>The proposed method uses multirotor state measurements together with local visual features, consisting of keypoints and associated descriptors extracted from the landing surface, to predict attitude and thrust commands.</blockquote>
+<blockquote>The policy is trained in simulation using synthetic keypoints with randomly generated normalized descriptors, enabling zero-shot deployment with different local feature extractors onboard the UAV.</blockquote>
+<blockquote>The policy is implemented as a Gaussian actor-critic</blockquote>
+<blockquote>we use sparse local features</blockquote></section>
+  <section class="note-sec"><h2>数据</h2><p>仿真在 ROS/Gazebo 中进行，与 MPC-NE 基线对比，并设预定义 5×5 AprilTag 布局（PD）与随机图案+A-KAZE（RD）两个变体，每种 5 个随机种子、各 500 次降落。真机在搭载 Jetson Orin Nano 的四旋翼上全机载运行（PX4 EKF2 状态估计、PX4 底层控制器、ROS 2 通信），同一策略在 Stewart 平台上切换 A-KAZE 与 SURF 两种特征提取器，共 358 次试验。随后把同一套流程不重训搬到泳池浮台上做 53 次试验，考察人工造浪下的泛化。</p><h3>原文依据</h3>
+<blockquote>All methods are evaluated independently over 500 landing trials.</blockquote>
+<blockquote>Stewart platform (AKAZE) 177 39.55 3.39 59.32 97.74 3.50 ± 1.08</blockquote>
+<blockquote>Pool (AKAZE) 53 3.77 7.54 90.57 98.11 2.90 ± 1.56</blockquote>
+<blockquote>Finally, we perform extensive real-world experiments, demonstrating autonomous onboard landing using two different local feature extractors.</blockquote></section>
+  <section class="note-sec"><h2>指标</h2>
+  <table><tr><th>指标</th><th>数值</th><th>原文依据</th></tr>
+  <tr><td>Simulation success rate (Ours PD)</td><td><b>74.21%</b></td><td>Ours (PD) 74.21 ± 3.93 25.79 ± 3.93 5.02 ± 2.28</td></tr>
+<tr><td>Simulation success rate (MPC-NE baseline)</td><td><b>48.60%</b></td><td>MPC-NE 48.60 51.40 9.06 ± 9.14</td></tr>
+<tr><td>Real-world touchdown success, Stewart platform (AKAZE)</td><td><b>59.32%</b></td><td>Stewart platform (AKAZE) 177 39.55 3.39 59.32 97.74 3.50 ± 1.08</td></tr>
+<tr><td>Real-world touchdown success, pool (AKAZE)</td><td><b>90.57%</b></td><td>Pool (AKAZE) 53 3.77 7.54 90.57 98.11 2.90 ± 1.56</td></tr>
+  </table></section>
+  <section class="note-sec"><h2>局限</h2><p>失效模式集中于触地姿态：Stewart 平台上倾角越界占 39.55%–41.44%，触地成功率仅 57%–59%，明显低于泳池浮台的 90.57%，说明平台运动越剧烈越难保证触地姿态。验证仍在受控环境（试验台与人工造浪泳池），训练用的平台运动为正弦叠加模型，与真实海况的不规则动力学存在差距。随机描述子变体成功率 63.08%、掎毁率 36.92%，对特征质量与数量敏感；方法还需平台始终处于下视相机视野内，且未估计平台状态，因此没有显式的安全保证。</p><h3>原文依据</h3>
+<blockquote>Stewart platform (SURF) 181 41.44 4.97 57.46 96.13 4.95 ± 7.71</blockquote>
+<blockquote>Ours (RD) 63.08 ± 11.26 36.92 ± 11.26 4.28 ± 1.62</blockquote></section>
+  <p><a href="index.html">← 返回笔记库</a> · <a href="https://arxiv.org/pdf/2605.23717">原文 PDF ↗</a></p>
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · <a href="https://github.com/fjx0428/paper-navigator">GitHub</a> · <a href="https://paper-navigator-2m06.zai.site">在线演示说明</a></footer>
+</main>
+</body>
+</html>

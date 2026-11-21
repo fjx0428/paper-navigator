@@ -1,7 +1,28 @@
-# 论文领航插件挂载配置（第 1 周）
+# 论文领航插件挂载配置
 # 用法：在 deepseek-harness 目录下执行
 #   pnpm dsh web --patch /Users/leiyu/学科实践大作业/plugin/cordis.yml
 # 注意：loader 不改变模块解析基准目录，插件路径必须是绝对路径。
+#
+# 第二段：激活智谱路由（llm-pi-ai 出厂休眠，路由由 providers 配置驱动；
+# apiKeyEnv 指向环境变量 ZAI_CODING_CN_API_KEY，端点用内置目录的 open.bigmodel.cn）。
+# 第三段：把默认模型切到 glm-5.3-flash（按 id 覆盖 base 的整行 config）。
 - insert:
     - id: paper-navigator
       name: '/Users/leiyu/学科实践大作业/plugin/src/index.ts'
+- id: llm-pi-ai
+  config:
+    providers:
+      zai-coding-cn:
+        apiKeyEnv: ZAI_CODING_CN_API_KEY
+        displayName: 智谱 GLM（bigmodel.cn）
+        models:
+          - id: glm-5.3-flash
+            name: GLM-5.3 Flash
+          - id: glm-5.3
+            name: GLM-5.3
+          - id: glm-5.2
+            name: GLM-5.2
+- id: agent-default-model
+  config:
+    provider: zai-coding-cn
+    model: glm-5.3-flash

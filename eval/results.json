@@ -182,10 +182,9 @@
     "quoteHit": 21,
     "toolCalls": 13,
     "toolOk": 12,
-    "factMatched": 8,
+    "factMatched": 9,
     "factTotal": 11,
     "factMisses": [
-      "主指标:10000",
       "主指标:mnli",
       "数据:mnli"
     ]
@@ -201,12 +200,11 @@
     "quoteHit": 8,
     "toolCalls": 0,
     "toolOk": 0,
-    "factMatched": 2,
+    "factMatched": 3,
     "factTotal": 11,
     "factMisses": [
       "方法:w0",
       "方法:ba",
-      "主指标:10000",
       "主指标:wikisql",
       "主指标:mnli",
       "主指标:samsum",

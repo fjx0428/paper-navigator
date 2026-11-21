@@ -13,6 +13,10 @@
     <a href="index.html">首页</a>
     <a href="architecture.html">架构</a>
     <a href="demo.html">演示</a>
+    <a href="survey.html">调研</a>
+    <a href="read.html">阅读</a>
+    <a href="models.html">模型</a>
+    <a href="notes/index.html">笔记</a>
     <a href="eval.html">评测</a>
     <a href="run.html" class="active">运行</a>
   </nav>
@@ -27,13 +31,15 @@
     <tr><td>Harness commit</td><td><code>2e39e70496aa02986ca6a820c5d497e816b69d7e</code>（浅克隆）</td></tr>
     <tr><td>Harness 版本</td><td>0.2.2-rc.5</td></tr>
     <tr><td>pnpm</td><td>11.28.x（仓库 <code>packageManager</code> 钉定）</td></tr>
-    <tr><td>模型</td><td>DeepSeek-V4.1-Flash（<code>DEEPSEEK_API_KEY</code>）</td></tr>
+    <tr><td>已发表评测的模型</td><td>DeepSeek-V4.1-Flash（<code>DEEPSEEK_API_KEY</code>）</td></tr>
+    <tr><td>可选模型</td><td>智谱 GLM，密钥 <code>ZHIPU_API_KEY</code>。选型见<a href="models.html">模型页</a></td></tr>
   </table>
 
   <h2>步骤</h2>
-<pre><code># 0. 准备：Node ≥ 24.9，pnpm 11，DeepSeek API Key
+<pre><code># 0. 准备：Node ≥ 24.9，pnpm 11。两把钥匙都放环境变量，不要写进仓库
 npm install -g pnpm@11
-export DEEPSEEK_API_KEY="你的 Key"
+export DEEPSEEK_API_KEY="你的 DeepSeek Key"
+export ZHIPU_API_KEY="你的智谱 Key"
 
 # 1. Harness 源码（浅克隆足够）
 git clone --depth 1 https://github.com/deepseek-ai/deepseek-harness.git
@@ -57,18 +63,20 @@ pnpm dsh web --patch /绝对路径/plugin/cordis.yml
   </div>
 
   <h2>复跑评测</h2>
-<pre><code># 全量 8 篇 + 摘要对照组（约 30 分钟，需要 API Key）
+<pre><code># 全量 8 篇 + 摘要对照组（约 30 分钟，沿用当前默认模型）
 node --import tsx eval/run_eval.ts
+# 换默认模型后再跑，才会得到另一列数字。已发表的表是 DeepSeek-V4.1-Flash
+node scripts/use-model.mjs glm-5.3-flash
 # 渲染评测表
 node --import tsx eval/render_results.ts
-# 单元测试（17 个）
+# 单元测试（25 个）
 node --import tsx --test plugin/tests/*.test.ts</code></pre>
 
   <h2>已知问题</h2>
   <table>
     <tr><th>现象</th><th>原因与规避</th></tr>
     <tr><td>web 端 <code>/paper</code> 斜杠手势报 <code>source must be a string</code></td><td>Harness 0.2.2-rc.5 对运行时注册技能的加载校验要求 source 字段。规避：对话直接说「阅读 arXiv:xxx」（技能目录会注入上下文，模型自行调用），或用 <code>dsh headless</code>。</td></tr>
-    <tr><td>arXiv 偶发 <code>fetch failed</code></td><td>本机到 arxiv.org 的连接偶发秒断。fetch_arxiv 已内置 3 次退避重试；极端情况模型会自行重试或如实报告。</td></tr>
+    <tr><td>arXiv 偶发 <code>fetch failed</code></td><td>本机到 arxiv.org 的 IPv6 路径偶发秒断。插件已优先走 IPv4，并保留 3 次退避；同一篇 PDF 下载成功后缓存在临时目录，复跑不再重下。</td></tr>
     <tr><td>扫描版 PDF</td><td>无文本层会被明确拒绝（本期不做 OCR），换有文本层的论文即可。</td></tr>
   </table>
 

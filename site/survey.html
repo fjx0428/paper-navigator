@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>调研 · 论文领航</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="architecture.html">架构</a>
+    <a href="demo.html">演示</a>
+    <a href="survey.html" class="active">调研</a>
+    <a href="read.html">阅读</a>
+    <a href="models.html">模型</a>
+    <a href="notes/index.html">笔记</a>
+    <a href="eval.html">评测</a>
+    <a href="run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>从题目到对照</h1>
+  <p class="lead">科研阅读不是把一篇论文缩成一段话。先按主题检索，再逐篇精读并拦住编造的引用，最后把已经落盘的笔记按同一组问题摊开：各自在解决什么、用什么方法、数据从哪来、指标是多少、还没做到哪。</p>
+
+  <h2>一对姊妹论文</h2>
+  <p>后一篇引用了前一篇，但成功定义不同，百分比不能画在同一根轴上。每张卡片是一条结构：问题走到局限。带百分号且只有一个数字的指标才画成长条。</p>
+  <div class="boards">
+    <article class="board"><h3><a href="read.html?id=2605.23717">2605.23717</a></h3><p class="board-title">Vision-Based Agile Landing on Turbulent Waters</p><ol class="spine"><li><b>问题</b><span>多旋翼在海上船只降落时，机体与平台同时运动、运动强耦合，是典型的困难场景</span></li><li><b>方法</b><span>把降落建模为 POMDP，策略直接把「当前/上一帧稀疏关键点+描述子、机体状态、上一动作」映射为姿态与推…</span></li><li><b>数据</b><span>仿真在 ROS/Gazebo 中进行，与 MPC-NE 基线对比，并设预定义 5×5 AprilTag …</span></li><li><b>指标</b><span>74.21% · 48.60%</span></li><li><b>局限</b><span>失效模式集中于触地姿态：Stewart 平台上倾角越界占 39.55%–41.44%，触地成功率仅 57…</span></li></ol><div class="meters"><div class="meter"><i style="width:74.21%"></i><b>74.21%</b><span>Simulation success rate (Ours PD)</span></div><div class="meter"><i style="width:48.6%"></i><b>48.60%</b><span>Simulation success rate (MPC-NE baseline)</span></div><div class="meter"><i style="width:59.32%"></i><b>59.32%</b><span>Real-world touchdown success, Stewart platform (AKAZE)</span></div><div class="meter"><i style="width:90.57%"></i><b>90.57%</b><span>Real-world touchdown success, pool (AKAZE)</span></div></div><p><a href="read.html?id=2605.23717">左边看论文，右边看笔记</a></p></article>
+<article class="board"><h3><a href="read.html?id=2610.03924">2610.03924</a></h3><p class="board-title">Barrier-Shaped Recurrent Reinforcement Learning for Autonomous Landing on a Heaving Ship Deck</p><ol class="spine"><li><b>问题</b><span>论文研究四旋翼无人机在起伏（heave）舰船甲板上的自主降落：甲板只做升沉运动，且降落时无法预知甲板未来…</span></li><li><b>方法</b><span>策略侧采用非对称 actor–critic 的循环网络：actor 每个 20 Hz 步只接收 17 维…</span></li><li><b>数据</b><span>训练在 4096 个并行仿真环境中完成，随后用 16 个环境做把机载视觉流水线放进回路的小规模微调</span></li><li><b>指标</b><span>31/31, 20/20 · 77% (mocap) / 50% (vision)</span></li><li><b>局限</b><span>实验台只能复现甲板运动学本身，没有风、甲板空气尾流，也没有完整的六自由度海况，且室内可飞行程受甲板位移限…</span></li></ol><div class="meters"><div class="meter"><b>31/31, 20/20</b><span>Landing success (mocap/vision trials)</span></div><div class="meter"><b>77% (mocap) / 50% (vision)</b><span>First-attempt landing rate</span></div><div class="meter"><b>6.5 s (mocap) / 7.3 s (vision)</b><span>Median time to first contact</span></div><div class="meter"><b>0.70 m peak-to-peak, 7.5 s mean period</b><span>Deck emulator heave</span></div></div><p><a href="read.html?id=2610.03924">左边看论文，右边看笔记</a></p></article>
+  </div>
+  <h2>逐字段对照</h2>
+  <p>格子里的中文是插件写进 <code>notes/*.json</code> 的句子，不是另写的摘要。</p>
+  <div class="table-scroll"><table class="compare">
+    <tr><th></th><th>2605.23717<br>Vision-Based Agile Landing on Turbulent Waters</th><th>2610.03924<br>Barrier-Shaped Recurrent Reinforcement Learning for Autonomous Landing on a Heaving Ship Deck</th></tr>
+    <tr><td>问题</td><td>多旋翼在海上船只降落时，机体与平台同时运动、运动强耦合，是典型的困难场景；传统做法需要在部署时检测并预测平台运动（如视觉标记或平台状态估计），已有工作依赖显式平台状态。本文目标是只用无人机自身状态与降落面上的局部视觉特征，在部署阶段不做平台状态的显式观测或估计，也能快速完成降落。作者声称这是首个在湍流海况下不依赖显式平台状态的敏捷海上降落方法。</td><td>论文研究四旋翼无人机在起伏（heave）舰船甲板上的自主降落：甲板只做升沉运动，且降落时无法预知甲板未来的运动轨迹，因此下降时机只能从观测历史中推断，构成部分可观测的有限时域问题。难点在于既要对准甲板中心并保持水平姿态，又要在剩余高度内把甲板相对垂直速度降到安全范围，否则会以过大相对速度触地。作者把该问题同时当作学习问题与在线安全性问题来处理，并强调其贡献是工程组合与实机验证，而非新的安全学习理论。</td></tr>
+<tr><td>方法</td><td>把降落建模为 POMDP，策略直接把「当前/上一帧稀疏关键点+描述子、机体状态、上一动作」映射为姿态与推力指令，交给常规底层姿态控制器跟踪，部署时不观测也不估计平台状态。视觉端不用分割掩码或原始 RGB，而是用 SRPose 稀疏关键点编码器，描述子先做 L2 归一化，使匹配先验取决于方向而非幅值。训练时用合成关键点与随机生成的归一化描述子替代真实特征提取器，因此同一策略可零样本对接 SURF、A-KAZE 等不同提取器；策略为高斯 actor-critic（actor/critic 各为两层 512 单元 tanh MLP），在 Aerial Gym …</td><td>策略侧采用非对称 actor–critic 的循环网络：actor 每个 20 Hz 步只接收 17 维甲板相对状态（位置、速度、姿态四元数、机体系重力、上一帧指令），经两层 GRU（128、64）与 32 单元 ELU MLP 输出世界系速度与偏航角速度指令，复用飞控自身的速度设定点接口；critic 在训练时额外看到未来 6 s 的甲板高度（以及相对角速度等特权信息），从而在不改变机上可得信息的前提下降低方差。CBF 停止裕度在两处使用：训练时作为奖励项对 max(0, −h)/0.25 m 施加 Huber 罚，迫使策略保留刹车余量；部署时作为 2…</td></tr>
+<tr><td>数据</td><td>仿真在 ROS/Gazebo 中进行，与 MPC-NE 基线对比，并设预定义 5×5 AprilTag 布局（PD）与随机图案+A-KAZE（RD）两个变体，每种 5 个随机种子、各 500 次降落。真机在搭载 Jetson Orin Nano 的四旋翼上全机载运行（PX4 EKF2 状态估计、PX4 底层控制器、ROS 2 通信），同一策略在 Stewart 平台上切换 A-KAZE 与 SURF 两种特征提取器，共 358 次试验。随后把同一套流程不重训搬到泳池浮台上做 53 次试验，考察人工造浪下的泛化。</td><td>训练在 4096 个并行仿真环境中完成，随后用 16 个环境做把机载视觉流水线放进回路的小规模微调；仿真基准以 1024 个环境、每个控制器约 10 500 次触地比较五种控制器（完整方法、去掉 CBF 奖励项、去掉 critic 未来甲板信息、PD、恒定下降）。实物实验用并联机械臂平台复现实测舰船升沉（峰峰值 0.70 m、平均周期 7.5 s），并配一台带机载相机的四旋翼，共完成 31 次动捕试验与 20 次视觉试验，全部成功降落。动捕下 97%、视觉下 95% 的切断推力时刻落在 0.5 m/s 判据内，首次尝试成功率分别为 77% 与 50%，到…</td></tr>
+<tr><td>指标</td><td>Simulation success rate (Ours PD) 74.21%<br>Simulation success rate (MPC-NE baseline) 48.60%<br>Real-world touchdown success, Stewart platform (AKAZE) 59.32%</td><td>Landing success (mocap/vision trials) 31/31, 20/20<br>First-attempt landing rate 77% (mocap) / 50% (vision)<br>Median time to first contact 6.5 s (mocap) / 7.3 s (vision)</td></tr>
+<tr><td>局限</td><td>失效模式集中于触地姿态：Stewart 平台上倾角越界占 39.55%–41.44%，触地成功率仅 57%–59%，明显低于泳池浮台的 90.57%，说明平台运动越剧烈越难保证触地姿态。验证仍在受控环境（试验台与人工造浪泳池），训练用的平台运动为正弦叠加模型，与真实海况的不规则动力学存在差距。随机描述子变体成功率 63.08%、掎毁率 36.92%，对特征质量与数量敏感；方法还需平台始终处于下视相机视野内，且未估计平台状态，因此没有显式的安全保证。</td><td>实验台只能复现甲板运动学本身，没有风、甲板空气尾流，也没有完整的六自由度海况，且室内可飞行程受甲板位移限制。CBF 只覆盖甲板相对垂直通道并依赖假设的刹车加速度上界，实机上其输入会延迟甚至失效，因此滤波器给出的保证只对“它拿到的状态”成立，作者把估计器时延与有效性的处理留作未来工作。视觉链路确实暴露了这一弱点：视觉垂直速度估计滞后动捕约 0.49 s，10 次视觉试验中的拦截全部是提前触发（真实裕度仍为正），其中 8 次纯粹由滞后估计导致；把相机渲染与检测器放进训练回路又受吞吐限制，只扩到 16 个环境，几乎没能缩小感知差距。</td></tr>
+  </table></div>
+  <p>读的时候把两列分开看。左边部署时不估计平台状态，动作是姿态和推力。右边用循环策略看甲板相对状态，余量不够就中止重试。两边的成功定义不一样，百分比不能横比。</p>
+
+  <h2>已经读过的 9 篇</h2>
+  <ul class="note-list">
+    <li><a href="read.html?id=1706.03762">1706.03762</a> Attention Is All You Need<p>序列转导任务的主流做法是编码器-解码器结构的循环或卷积神经网络，其中 RNN 按符号位置逐步展开隐藏状态，这种固有的时序性使单个训练样本内部无法并行，序列越长越受显存与批大小限制。注意力机制通常只是与循环网络配合使用的辅助组件。本文的问题是：能否完全去掉循环与卷积，仅靠注意力在输…</p></li>
+<li><a href="read.html?id=1706.06978">1706.06978</a> Deep Interest Network for Click-Through Rate Prediction<p>论文针对展示广告 CTR 预测中 Embedding&amp;MLP 范式的核心缺陷：用户特征被池化为固定长度向量，且该向量与候选广告无关，因此维度受限时成为表达用户多样兴趣的瓶颈。作者指出，直接扩大 embedding 维度会带来过拟合，并显著增加计算与存储负担，对工业在线系统不可接受…</p></li>
+<li><a href="read.html?id=1810.04805">1810.04805</a> BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding<p>论文针对的是当时语言模型预训练的单向性约束：ELMo 用左右两个独立单向模型的浅层拼接，GPT 只用从左到右的 Transformer，每个 token 无法在每一层同时融合左右上下文。作者指出这种限制对句子级任务次优，对问答这类 token 级任务尤其有害。BERT 的目标是用…</p></li>
+<li><a href="read.html?id=2005.11401">2005.11401</a> Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks<p>预训练语言模型把事实知识存在参数里，但难以精确访问和操作这些知识，在知识密集型任务上不如任务专用架构；同时，其决策缺乏可追溯来源，世界知识也难以更新。已有的参数记忆与非参数记忆混合模型（REALM、ORQA）只被用于抽取式下游任务。本文要把这种混合记忆推广到 seq2seq 生成…</p></li>
+<li><a href="read.html?id=2106.09685">2106.09685</a> LoRA: Low-Rank Adaptation of Large Language Models<p>大规模预训练语言模型要为每个下游任务做全量微调，每个任务都要保存并部署一份与原始模型同样大的参数副本；以 GPT-3 175B 为例，这种部署方式成本高到不可行。已有参数高效方法（adapter、prefix 类）往往引入推理延迟或缩短可用序列长度，且常常达不到全量微调的质量。作…</p></li>
+<li><a href="read.html?id=2210.03629">2210.03629</a> ReAct: Synergizing Reasoning and Acting in Language Models<p>论文针对的问题是：LLM 的推理能力（如思维链提示）与行动能力（如动作规划生成）此前基本被当作两个独立课题研究，缺少让二者在同一条轨迹里互相支撑的机制。作者认为交错生成推理与动作能带来协同：推理帮助模型归纳、追踪和更新行动计划并处理异常，行动则让模型能查询知识库或环境以补充信息。…</p></li>
+<li><a href="read.html?id=2303.18223">2303.18223</a> A Survey of Large Language Models<p>语言建模旨在建模词序列的生成概率并预测后续 token，其研究从统计语言模型、神经语言模型一路演进到在大规模语料上预训练的 Transformer。研究者发现参数规模超过一定量级后，模型不仅性能显著提升，还会出现小模型不具备的能力，因此需要一个统一术语和系统梳理来界定“大语言模型…</p></li>
+<li><a href="read.html?id=2605.23717">2605.23717</a> Vision-Based Agile Landing on Turbulent Waters<p>多旋翼在海上船只降落时，机体与平台同时运动、运动强耦合，是典型的困难场景；传统做法需要在部署时检测并预测平台运动（如视觉标记或平台状态估计），已有工作依赖显式平台状态。本文目标是只用无人机自身状态与降落面上的局部视觉特征，在部署阶段不做平台状态的显式观测或估计，也能快速完成降落。…</p></li>
+<li><a href="read.html?id=2610.03924">2610.03924</a> Barrier-Shaped Recurrent Reinforcement Learning for Autonomous Landing on a Heaving Ship Deck<p>论文研究四旋翼无人机在起伏（heave）舰船甲板上的自主降落：甲板只做升沉运动，且降落时无法预知甲板未来的运动轨迹，因此下降时机只能从观测历史中推断，构成部分可观测的有限时域问题。难点在于既要对准甲板中心并保持水平姿态，又要在剩余高度内把甲板相对垂直速度降到安全范围，否则会以过大…</p></li>
+  </ul>
+  <p>对话里说「对比 2605.23717 和 2610.03924」，插件会调用 <code>compare_notes</code>，只把这些字段交回模型。模型补不了笔记里没有的数字。</p>
+
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · 本页只排版已经落盘的笔记 · 2026-11</footer>
+</main>
+</body>
+</html>

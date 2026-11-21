@@ -121,7 +121,7 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
     y += 0.78
     rule(s, M, y - 0.16, 7.0)
   }
-  s.addText('模型只决定何时调用、传什么参数；工具行为完全确定、可测试（17 个单元测试）。', { x: M, y: 5.1, w: 6.9, h: 0.8, fontSize: 14, color: MUTED, fontFace: FONT, margin: 0 })
+  s.addText('模型只决定何时调用、传什么参数；工具行为完全确定、可测试（25 个单元测试）。', { x: M, y: 5.1, w: 6.9, h: 0.8, fontSize: 14, color: MUTED, fontFace: FONT, margin: 0 })
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 7.75, y: 1.75, w: 5.05, h: 4.9, fill: { color: '11141B' }, rectRadius: 0.09 })
   s.addText([
     { text: '{', options: { breakLine: true } },
@@ -203,25 +203,13 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
     body = rows.filter(r => r.group === '插件').map(r => [
       r.id, { text: r.complete ? '通过' : '未通过', options: { color: r.complete ? ACCENT : RED, bold: true } }, `${r.quoteHit}/${r.quoteTotal}（${pct(r.quoteHit, r.quoteTotal)}）`, `${r.toolOk}/${r.toolCalls}`, `${r.factMatched}/${r.factTotal}`,
     ])
-    const p = rows.filter(r => r.group === '插件')
-    const c = rows.filter(r => r.group === '对照组')
-    const sum = (rs, f) => rs.reduce((a, r) => a + f(r), 0)
-    const pH = { hit: sum(p, r => r.quoteHit), tot: sum(p, r => r.quoteTotal) }
-    const cH = { hit: sum(c, r => r.quoteHit), tot: sum(c, r => r.quoteTotal) }
-    body.push([
-      { text: '汇总（插件组 / 对照组）', options: { bold: true, colspan: 1 } },
-      { text: `${p.filter(r => r.complete).length}/${p.length}`, options: { bold: true } },
-      { text: `${pct(pH.hit, pH.tot)} vs ${pct(cH.hit, cH.tot)}`, options: { bold: true, color: ACCENT } },
-      { text: `均值 ${(sum(p, r => r.toolCalls) / Math.max(1, p.length)).toFixed(1)} vs 0`, options: { bold: true } },
-      { text: `${pct(sum(p, r => r.factMatched), sum(p, r => r.factTotal))} vs ${pct(sum(c, r => r.factMatched), sum(c, r => r.factTotal))}`, options: { bold: true } },
-    ])
   } else {
     header = ['arXiv', '笔记完整', '引用命中', '工具成功/次', '事实记号']
     body = [['（评测运行中，结果由 eval/run_eval.ts 写入）', '', '', '', '']]
   }
   s.addTable([header.map(t => ({ text: t, options: { bold: true, color: 'FFFFFF', fill: { color: PRIMARY } } })), ...body], {
-    x: M, y: 1.8, w: W - 2 * M, fontSize: 12.5, fontFace: FONT, color: TEXT,
-    border: { pt: 0.75, color: LINE }, fill: { color: CARD }, rowH: 0.34, valign: 'middle', margin: 0.06,
+    x: M, y: 1.62, w: W - 2 * M, fontSize: 12, fontFace: FONT, color: TEXT,
+    border: { pt: 0.75, color: LINE }, fill: { color: CARD }, rowH: 0.30, valign: 'middle', margin: 0.05,
   })
   if (existsSync(rp)) {
     const rows = JSON.parse(readFileSync(rp, 'utf8'))
@@ -240,11 +228,11 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
       ['事实关键记号', `${pct(pF.m, pF.t)}`, `${pct(cF.m, cF.t)}`],
       ['平均工具调用次数', `${(sum(p, r => r.toolCalls) / Math.max(1, p.length)).toFixed(1)} 次/篇`, '0（无工具）'],
     ], {
-      x: M, y: 4.85, w: W - 2 * M, fontSize: 12.5, fontFace: FONT, color: TEXT,
-      border: { pt: 0.75, color: LINE }, fill: { color: CARD }, rowH: 0.32, valign: 'middle', margin: 0.06, colW: [3.1, 4.6, 4.53],
+      x: M, y: 4.55, w: W - 2 * M, fontSize: 12, fontFace: FONT, color: TEXT,
+      border: { pt: 0.75, color: LINE }, fill: { color: CARD }, rowH: 0.30, valign: 'middle', margin: 0.05, colW: [3.1, 4.6, 4.53],
     })
   }
-  s.addText('引用命中 = 笔记 quote 对离线抽取原文做「仅合并空白后逐字包含」复核；事实记号 = 每篇 3 个标准事实中的关键数字/名称是否出现在笔记中（近似核对，人工复核见 results.md）。模型 DeepSeek-V4.1-Flash。', { x: M, y: 6.75, w: W - 2 * M, h: 0.6, fontSize: 11, color: MUTED, fontFace: FONT, margin: 0 })
+  s.addText('引用命中 = 笔记 quote 对离线抽取原文做「仅合并空白后逐字包含」复核。事实记号 = 标准事实里的数字和名称是否出现在笔记中，千分位逗号先去掉。模型 DeepSeek-V4.1-Flash。', { x: M, y: 6.22, w: W - 2 * M, h: 0.55, fontSize: 11, color: MUTED, fontFace: FONT, margin: 0 })
   foot(s, 7)
 }
 
@@ -348,7 +336,7 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
   const rows = [
     ['做成了', '一个可用的 Agent 产品 Demo：挂载于 Harness 的论文阅读插件，四个工具 + 技能 + 引用校验，网页一句话到笔记落盘'],
     ['证明了', '带工具与引用校验的笔记，其每条依据都能被机械验证；编造的指标会被退回——摘要对照组给出了对照数字'],
-    ['留下了', '可复现的评测集与轨迹、17 个单元测试、展示网站与本文档；下一阶段可做语义级校验与检索式精读'],
+    ['留下了', '可复现的评测集与轨迹、25 个单元测试、展示网站与本文档；下一阶段可做语义级校验与检索式精读'],
   ]
   let y = 1.9
   for (const [t, d] of rows) {

@@ -13,6 +13,10 @@
     <a href="index.html">首页</a>
     <a href="architecture.html" class="active">架构</a>
     <a href="demo.html">演示</a>
+    <a href="survey.html">调研</a>
+    <a href="read.html">阅读</a>
+    <a href="models.html">模型</a>
+    <a href="notes/index.html">笔记</a>
     <a href="eval.html">评测</a>
     <a href="run.html">运行</a>
   </nav>
@@ -27,20 +31,22 @@
     <div class="arrow">→</div>
     <div class="node"><b>paper 技能</b><small>注入固定阅读顺序与引用规则</small></div>
     <div class="arrow">→</div>
-    <div class="node"><b>模型（DeepSeek Flash）</b><small>决定调用哪个工具、传什么参数</small></div>
+    <div class="node"><b>模型</b><small>暂定智谱 GLM-5.3-Flash</small></div>
     <div class="arrow">→</div>
-    <div class="node"><b>四个工具</b><small>确定性代码执行</small></div>
+    <div class="node"><b>六个工具</b><small>检索、精读、校验、对照</small></div>
     <div class="arrow">→</div>
     <div class="node"><b>write_note 校验</b><small>失败退回 · 成功落盘 Markdown</small></div>
   </div>
 
-  <h2>四个工具</h2>
+  <h2>六个工具</h2>
   <table>
     <tr><th>工具</th><th>输入</th><th>返回</th></tr>
+    <tr><td><code>search_arxiv</code></td><td>主题词，最多 8 篇</td><td>编号、标题、作者、摘要。不下载 PDF</td></tr>
     <tr><td><code>fetch_arxiv</code></td><td>arXiv id</td><td>标题、作者、摘要；下载 PDF 并抽取章节（内置 3 次网络重试）</td></tr>
     <tr><td><code>list_sections</code></td><td>arXiv id</td><td>章节目录（标题、页码范围、词数）</td></tr>
     <tr><td><code>read_section</code></td><td>章节序号、max_chars ≤ 12000</td><td>该节正文（精确按标题行切片）；返回文本进入引用校验语料</td></tr>
     <tr><td><code>write_note</code></td><td>笔记 JSON</td><td>引用校验通过 → 写 Markdown + JSON；否则整体退回并给出逐条错误</td></tr>
+    <tr><td><code>compare_notes</code></td><td>若干 arXiv id，可省略</td><td>已落盘笔记的问题 / 方法 / 数据 / 指标 / 局限。不补笔记里没有的数字</td></tr>
   </table>
 
   <h2>笔记结构（字段已冻结）</h2>
@@ -60,7 +66,7 @@
 - insert:
     - id: paper-navigator
       name: '/绝对路径/plugin/src/index.ts'</code></pre>
-  <p>插件模块 <code>inject: ['tools', 'skills']</code>，在 <code>apply(ctx)</code> 里 <code>ctx.tools.register(defineTool(...))</code> × 4、<code>ctx.skills.register({ name: 'paper', ... })</code> × 1。所有注册挂在 Cordis effect 上，卸载即反注册。</p>
+  <p>插件模块 <code>inject: ['tools', 'skills']</code>，在 <code>apply(ctx)</code> 里注册 6 个工具和 1 个 <code>paper</code> 技能。所有注册挂在 Cordis effect 上，卸载即反注册。</p>
 
   <h2>Agent 循环里的角色分工</h2>
   <div class="card">

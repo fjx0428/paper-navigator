@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding · 论文领航笔记</title>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="notes.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="../index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../architecture.html">架构</a>
+    <a href="../demo.html">演示</a>
+    <a href="index.html" class="active">笔记</a>
+    <a href="../eval.html">评测</a>
+    <a href="../run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</h1>
+  <p class="lead">arXiv:<a href="https://arxiv.org/abs/1810.04805">1810.04805</a> · 由论文领航插件自动生成，全部引用经 write_note 逐字校验（仅合并空白）</p>
+  <section class="note-sec"><h2>问题</h2><p>论文针对的是当时语言模型预训练的单向性约束：ELMo 用左右两个独立单向模型的浅层拼接，GPT 只用从左到右的 Transformer，每个 token 无法在每一层同时融合左右上下文。作者指出这种限制对句子级任务次优，对问答这类 token 级任务尤其有害。BERT 的目标是用掩码语言模型实现深层双向预训练，并让同一个预训练模型只加一个输出层就能适配多种下游任务。</p><h3>原文依据</h3>
+<blockquote>Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.</blockquote>
+<blockquote>BERT is conceptually simple and empirically powerful.</blockquote></section>
+  <section class="note-sec"><h2>方法</h2><p>预训练由两个无监督任务组成。MLM 随机选中 15% 的 WordPiece token 并只预测这些被遮位置：其中 80% 换成 [MASK]、10% 换成随机词、10% 保持原词，以避免 [MASK] 只在预训练出现造成的错配。NSP 以各 50% 的概率判断 B 是 A 的真实下一句（IsNext）还是语料中的随机句（NotNext），用于学习句间关系。输入表示是 token、segment、position 三种 embedding 之和，[CLS] 的最终隐状态作为分类用聚合表示，句对以 [SEP] 分隔；微调时把任务输入输出接入同一 Transformer 端到端训练，仅新增少量参数。</p><h3>原文依据</h3>
+<blockquote>In order to train a deep bidirectional representa-</blockquote>
+<blockquote>we simply mask some percentage of the input</blockquote>
+<blockquote>tokens at random, and then predict those masked</blockquote>
+<blockquote>we mask 15% of all WordPiece to-</blockquote>
+<blockquote>next sentence that follows A (labeled as IsNext),</blockquote>
+<blockquote>and 50% of the time it is a random sentence from</blockquote></section>
+  <section class="note-sec"><h2>数据</h2><p>预训练语料为 BooksCorpus（800M 词）与英文 Wikipedia（2,500M 词），只用 WordPiece 切分、词表 30,000，并刻意保留文档级连续文本而非打散的句子。模型分 BERT_BASE（12 层、768 隐层、12 头，110M 参数）与 BERT_LARGE（24 层、1024 隐层、16 头，340M 参数）两档，前者参数量与 OpenAI GPT 对齐以便对比。微调与评测覆盖 11 个 NLP 任务，GLUE 上使用 batch size 32、训练 3 个 epoch，学习率在 5e-5 至 2e-5 之间按 Dev 集选择。</p><h3>原文依据</h3>
+<blockquote>We use WordPiece embeddings (Wu et al.,</blockquote>
+<blockquote>2016) with a 30,000 token vocabulary. The first</blockquote>
+<blockquote>use the BooksCorpus (800M words) (Zhu et al.,</blockquote>
+<blockquote>2015) and English Wikipedia (2,500M words).</blockquote>
+<blockquote>We use a batch size of 32 and fine-tune for 3</blockquote>
+<blockquote>(among 5e-5, 4e-5, 3e-5, and 2e-5) on the Dev set.</blockquote></section>
+  <section class="note-sec"><h2>指标</h2>
+  <table><tr><th>指标</th><th>数值</th><th>原文依据</th></tr>
+  <tr><td>GLUE score</td><td><b>80.5%</b></td><td>pushing the GLUE score to 80.5% (7.7% point absolute improvement)</td></tr>
+<tr><td>MultiNLI accuracy</td><td><b>86.7%</b></td><td>MultiNLI accuracy to 86.7% (4.6% absolute improvement)</td></tr>
+<tr><td>SQuAD v1.1 Test F1</td><td><b>93.2</b></td><td>SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement)</td></tr>
+<tr><td>SQuAD v2.0 Test F1</td><td><b>83.1</b></td><td>SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement)</td></tr>
+<tr><td>BERT_LARGE GLUE average</td><td><b>82.1</b></td><td>BERTLARGE 86.7/85.9 72.1 92.7 94.9 60.5 86.5 89.3 70.1 82.1</td></tr>
+<tr><td>Masking rate</td><td><b>15%</b></td><td>we mask 15% of all WordPiece to-</td></tr>
+<tr><td>Feature-based gap on CoNLL-2003</td><td><b>0.3 F1</b></td><td>0.3 F1 behind fine-tuning the entire model</td></tr>
+  </table></section>
+  <section class="note-sec"><h2>局限</h2><p>MLM 带来预训练与微调的不一致：[MASK] 在微调阶段不会出现，作者只能用 80% 替换为 [MASK]、10% 随机词、10% 保持原词的策略缓解而无法消除。NSP 训练出的 [CLS] 向量在微调之前并不是有意义的句子表示，它只是借助下游任务才获得聚合语义。此外 BERT_LARGE 在小数据集上微调不稳定，需多次随机重启并挑 Dev 最优模型，说明大模型微调对超参和随机性敏感。</p><h3>原文依据</h3>
+<blockquote>are creating a mismatch between pre-training and</blockquote>
+<blockquote>without fine-tuning, since it was trained with NSP.</blockquote>
+<blockquote>was sometimes unstable on small datasets,</blockquote>
+<blockquote>best model on the Dev set. With random restarts,</blockquote></section>
+  <p><a href="index.html">← 返回笔记库</a> · <a href="https://arxiv.org/pdf/1810.04805">原文 PDF ↗</a></p>
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · <a href="https://github.com/fjx0428/paper-navigator">GitHub</a> · <a href="https://paper-navigator-2m06.zai.site">在线演示说明</a></footer>
+</main>
+</body>
+</html>

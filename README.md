@@ -1,6 +1,6 @@
 # 论文领航 —— DeepSeek Harness 论文阅读插件
 
-厦门大学信息学院「学科实践三 / A+ 协同编程」期末项目。在 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 上开发论文阅读插件：输入 arXiv id，自动产出带原文引用的结构化笔记（问题 / 方法 / 数据 / 指标 / 局限），引用对不上原文会被 `write_note` 拒绝并退回。
+厦门大学信息学院「学科实践三 / A+ 协同编程」期末项目。在 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 上开发论文阅读插件：可以按主题 `search_arxiv`，也可以对一个 arXiv id 精读，产出带原文引用的结构化笔记（问题 / 方法 / 数据 / 指标 / 局限）。引用对不上原文会被 `write_note` 拒绝并退回。已落盘的笔记用 `compare_notes` 对照，不补笔记里没有的数字。
 
 实施路线见《大模型方向实施方案.md》。
 
@@ -11,9 +11,9 @@
 | Node | v26.13.0 |
 | pnpm | 11.28.13 |
 | Harness commit | `2e39e70496aa02986ca6a820c5d497e816b69d7e`（浅克隆） |
-| API Key | `DEEPSEEK_API_KEY`，配置于 `~/.zshrc` |
+| API Key | `DEEPSEEK_API_KEY`（已发表评测）、`ZHIPU_API_KEY`（智谱 GLM）。都在本机环境变量，仓库和 `.env` 之外不记录密钥 |
 
-Harness 源码克隆在本目录的 `deepseek-harness/`（已被 `.gitignore` 排除，不随本仓库提交），本仓库只记录其 commit。
+Harness 源码克隆在本目录的 `deepseek-harness/`（已被 `.gitignore` 排除，不随本仓库提交），本仓库只记录其 commit。智谱模型列表在 `config/zhipu.patch.yml`。插件工作时暂定调用 **GLM-5.3-Flash**（`provider: zhipu`，`reasoningEffort: high`），web 和 headless 都已写成这个默认。回到评测模型：`node scripts/use-model.mjs deepseek-flash`。选型见 `site/models.html`。
 
 ## 复现步骤
 
@@ -69,11 +69,11 @@ pnpm dsh web --patch /Users/leiyu/学科实践大作业/plugin/cordis.yml
 | 指标 | 插件组（四工具 + 校验） | 摘要对照组（无工具） |
 | --- | --- | --- |
 | 笔记六字段完整 | 8/8 | 8/8 |
-| 引用逐字命中率 | **158/158（100%）** | 78/81（96%，未命中 5 条全是编造的指标引用） |
-| 事实关键记号命中 | **117/150（78%）** | 85/150（57%；LoRA 论文仅 2/11） |
+| 引用逐字命中率 | **158/158（100%）** | 78/81（96%，未命中的 3 条都在 DIN，是摘要里没有、模型凭记忆写成的指标句） |
+| 事实关键记号命中 | **118/150（79%）** | 86/150（57%；LoRA 论文 3/11） |
 | 平均工具调用次数 | 11.3 次/篇 | 0（无工具） |
 
-对照组引用总量只有插件组一半（81 vs 158）；其 96% 的命中率高是因为它只能引用自己拿到的摘要——而一旦涉及摘要里没有的主指标，就开始编造（5 条未命中即为此）。事实记号 57% vs 78% 的差距与「编造指标」在 detail 表中逐篇可见（eval/results.md）。
+对照组引用总量只有插件组一半（81 vs 158）。96% 看起来接近，是因为对照组主要在复述摘要。3 条未命中全部出在 DIN（1706.06978）：摘要没有 AUC，模型写了一句原文里不存在的 “DIN improves AUC by 0.0090…”。内容差距看事实记号，57% 对 79%（eval/results.md）。换智谱模型不会自动改这张表，选型见 site/models.html。
 
 ## 完成标准对照（实施方案第 10 节）
 

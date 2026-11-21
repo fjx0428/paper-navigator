@@ -1,0 +1,45 @@
+# 智谱 GLM（开放平台 https://open.bigmodel.cn/api/paas/v4）
+# 密钥只从环境变量 ZHIPU_API_KEY 读取。不要把密钥写进本文件。
+# 本机 profile 已挂上同一段配置；换机器时再追加：
+#   pnpm dsh web --patch plugin/cordis.yml --patch config/zhipu.patch.yml
+- id: llm-pi-ai
+  config:
+    providers:
+      zhipu:
+        displayName: 智谱 GLM
+        apiKeyEnv: ZHIPU_API_KEY
+        api: openai-completions
+        baseURL: https://open.bigmodel.cn/api/paas/v4
+        compat:
+          supportsDeveloperRole: false
+          maxTokensField: max_tokens
+          thinkingFormat: deepseek
+        models:
+          - id: glm-5.3-flash
+            name: GLM-5.3-Flash
+            contextWindow: 1000000
+            maxTokens: 16384
+            reasoningEfforts:
+              off:
+              high: high
+          - id: glm-5.3
+            name: GLM-5.3
+            contextWindow: 1000000
+            maxTokens: 16384
+            reasoningEfforts:
+              off:
+              high: high
+          - id: glm-5.3-flashx
+            name: GLM-5.3-FlashX
+            contextWindow: 1000000
+            maxTokens: 16384
+            reasoningEfforts:
+              off:
+              high: high
+          - id: glm-4.7
+            name: GLM-4.7
+            contextWindow: 200000
+            maxTokens: 8192
+            reasoningEfforts:
+              off:
+              high: high

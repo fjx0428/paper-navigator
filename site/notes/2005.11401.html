@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks · 论文领航笔记</title>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="notes.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="../index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../architecture.html">架构</a>
+    <a href="../demo.html">演示</a>
+    <a href="index.html" class="active">笔记</a>
+    <a href="../eval.html">评测</a>
+    <a href="../run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</h1>
+  <p class="lead">arXiv:<a href="https://arxiv.org/abs/2005.11401">2005.11401</a> · 由论文领航插件自动生成，全部引用经 write_note 逐字校验（仅合并空白）</p>
+  <section class="note-sec"><h2>问题</h2><p>预训练语言模型把事实知识存在参数里，但难以精确访问和操作这些知识，在知识密集型任务上不如任务专用架构；同时，其决策缺乏可追溯来源，世界知识也难以更新。已有的参数记忆与非参数记忆混合模型（REALM、ORQA）只被用于抽取式下游任务。本文要把这种混合记忆推广到 seq2seq 生成，提出通用的检索增强生成（RAG）微调方案。</p><h3>原文依据</h3>
+<blockquote>However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures.</blockquote>
+<blockquote>Pre-trained models with a differentiable access mechanism to explicit non-parametric memory can overcome this issue, but have so far been only investigated for extractive downstream tasks.</blockquote>
+<blockquote>They cannot easily expand or revise their memory, can’t straightforwardly provide insight into their predictions, and may produce “hallucinations”</blockquote></section>
+  <section class="note-sec"><h2>方法</h2><p>RAG 由两部分组成：检索器 p(z|x) 用 DPR 双编码器在 Wikipedia 稠密向量索引上做 top-K MIPS 检索，生成器 p(y|x,z) 用 BART-large（400M 参数），把输入与检索段落拼接后生成。训练时把检索到的文档当作隐变量，用 top-K 近似做边缘化，检索器与生成器联合微调。作者给出两种形式：RAG-Sequence 对整条输出序列使用同一篇文档，RAG-Token 允许每个目标 token 依据不同文档，因此可以综合多篇文档的内容。</p><h3>原文依据</h3>
+<blockquote>To train the retriever and generator end-to-end, we treat the retrieved document as a latent variable.</blockquote>
+<blockquote>In the RAG-Token model we can draw a different latent document for each target token and marginalize accordingly.</blockquote>
+<blockquote>The retrieval component pη (z|x) is based on DPR [26]. DPR follows a bi-encoder architecture</blockquote>
+<blockquote>We use BART-large [32], a pre-trained seq2seq transformer [58] with 400M parameters.</blockquote></section>
+  <section class="note-sec"><h2>数据</h2><p>非参数记忆是 2018 年 12 月的 Wikipedia dump，每篇文章切成不重叠的 100 词块，共 21M 篇文档，用 FAISS 建单一 MIPS 索引；训练时检索 top k，k 取 5 或 10，测试时的 k 由 dev 集决定。评测覆盖四个开放域问答数据集（Natural Questions、TriviaQA、WebQuestions、CuratedTrec，报告 Exact Match），以及 MS-MARCO NLG 抽象式问答、Jeopardy 问题生成和 FEVER 事实核查。</p><h3>原文依据</h3>
+<blockquote>Each Wikipedia article is split into disjoint 100-word chunks, to make a total of 21M documents.</blockquote>
+<blockquote>Following Lee et al. [31] and Karpukhin et al. [26], we use the December 2018 dump.</blockquote>
+<blockquote>We consider k ∈ {5, 10} for training and set k for test time using dev data.</blockquote></section>
+  <section class="note-sec"><h2>指标</h2>
+  <table><tr><th>指标</th><th>数值</th><th>原文依据</th></tr>
+  <tr><td>Natural Questions 测试集 Exact Match（RAG-Sequence）</td><td><b>44.5</b></td><td>RAG-Seq. 44.5 56.8/68.0 45.2 52.2</td></tr>
+<tr><td>TriviaQA-Wiki 测试集 Exact Match（RAG-Sequence）</td><td><b>68.0</b></td><td>RAG-Seq. 44.5 56.8/68.0 45.2 52.2</td></tr>
+<tr><td>Open MS-MARCO NLG 相对 BART 的提升</td><td><b>+2.6 BLEU / +2.6 ROUGE-L</b></td><td>RAG-Sequence outperforms BART on Open MS-MARCO NLG by 2.6 Bleu points and 2.6 Rouge-L points.</td></tr>
+<tr><td>Jeopardy 人类评估中 RAG 更符合事实的比例</td><td><b>42.7%（BART 更符合事实仅 7.1%）</b></td><td>BART was more factual than RAG in only 7.1% of cases, while RAG was more factual in 42.7% of cases</td></tr>
+<tr><td>NQ 上正确答案不在任何检索文档中仍答对的比例</td><td><b>11.8%</b></td><td>achieving 11.8% accuracy in such cases for NQ, where an extractive model would score 0%</td></tr>
+<tr><td>索引热替换：用 2016 索引回答 2016 世界领导人问题的准确率</td><td><b>70%（2018 索引/2018 领导人 68%）</b></td><td>RAG answers 70% correctly using the 2016 index for 2016 world leaders and 68% using the 2018 index for 2018 world leaders.</td></tr>
+  </table></section>
+  <section class="note-sec"><h2>局限</h2><p>非参数记忆被限定在 Wikipedia 单一来源，作者也承认并非所有问题都能仅靠 Wikipedia 回答，知识库本身也不可避免带有偏差。检索器并非从零任务无关地学得：它用 DPR 初始化，而 DPR 在 Natural Questions 和 TriviaQA 上接受过检索监督；作者把两个分量能否从零联合预训练列为未来工作。检索并非在所有任务上都优于词重叠基线，FEVER 上 BM25 最好；索引热替换需要重建整个索引，且论文未系统评估检索带来的延迟与算力开销。</p><h3>原文依据</h3>
+<blockquote>not all questions are answerable from Wikipedia alone</blockquote>
+<blockquote>which uses retrieval supervision on Natural Questions and TriviaQA</blockquote>
+<blockquote>In future work, it may be fruitful to investigate if the two components can be jointly pre-trained from scratch</blockquote>
+<blockquote>For FEVER, BM25 performs best, perhaps since FEVER claims are heavily entity-centric and thus well-suited for word overlap-based retrieval.</blockquote>
+<blockquote>Wikipedia, or any potential external knowledge source, will probably never be entirely factual and completely devoid of bias.</blockquote></section>
+  <p><a href="index.html">← 返回笔记库</a> · <a href="https://arxiv.org/pdf/2005.11401">原文 PDF ↗</a></p>
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · <a href="https://github.com/fjx0428/paper-navigator">GitHub</a> · <a href="https://paper-navigator-2m06.zai.site">在线演示说明</a></footer>
+</main>
+</body>
+</html>

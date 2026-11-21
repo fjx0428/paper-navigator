@@ -13,19 +13,23 @@
     <a href="index.html" class="active">首页</a>
     <a href="architecture.html">架构</a>
     <a href="demo.html">演示</a>
+    <a href="survey.html">调研</a>
+    <a href="read.html">阅读</a>
+    <a href="models.html">模型</a>
+    <a href="notes/index.html">笔记</a>
     <a href="eval.html">评测</a>
     <a href="run.html">运行</a>
   </nav>
 </header>
 <main>
   <h1>论文领航</h1>
-  <p class="lead">一个挂在 <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> 上的论文阅读插件：对它说「阅读 arXiv:2210.03629」，它抓论文、看目录、按需读章节，写出固定结构的笔记——<b>每句关键结论都附原文依据，对不上原文的引用会被整体退回重写</b>。</p>
+  <p class="lead">挂在 <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> 上的科研阅读插件。从一个题目检索论文，按目录精读，写出带原文依据的笔记；引用对不上就整篇退回。多篇读完之后，按问题、方法、数据、指标和局限对照，而不是再写一篇没有出处的综述。</p>
 
   <div class="grid">
-    <div class="card"><b>四个确定性工具</b><br><small>fetch_arxiv / list_sections / read_section / write_note。模型只决定何时调用，工具代码负责执行。</small></div>
-    <div class="card"><b>引用校验</b><br><small>每条 quote 必须逐字命中已获取的原文（仅合并空白），编造的数字进不了笔记。</small></div>
-    <div class="card"><b>上下文裁剪</b><br><small>先看章节目录再挑读，144 页综述只读入约 3.6 万字符（约全文十分之一）。</small></div>
-    <div class="card"><b>可复现评测</b><br><small>8 篇论文 + 摘要对照组，引用命中与事实核对自动统计，一条命令复跑。</small></div>
+    <div class="card"><b>检索</b><br><small>search_arxiv 按主题找论文，只返回编号和摘要，不一次读完。</small></div>
+    <div class="card"><b>精读</b><br><small>先看目录再挑章节。144 页综述只读进约 3.6 万字符。</small></div>
+    <div class="card"><b>引用校验</b><br><small>每条 quote 必须逐字命中已读原文。编造的数字写不进笔记。</small></div>
+    <div class="card"><b>对照</b><br><small>compare_notes 只摊开已经落盘的笔记。没写进笔记的数字不许补。</small></div>
   </div>
 
   <h2>30 秒看一次真实运行</h2>
@@ -35,6 +39,9 @@
   </div>
   <p>更多逐步轨迹见<a href="demo.html">演示页</a>；「编造的指标被退回」的真实记录也在那里。</p>
 
+  <h2>同一题目下的两篇</h2>
+  <p>动平台降落的两篇姊妹论文已经读完。调研页用结构条和指标图把它们摊开。<a href="survey.html">去看对照</a>。点进一篇之后，左边是 PDF，右边是笔记：<a href="read.html?id=1706.03762">先看 Transformer</a>。</p>
+
   <h2>它解决的问题</h2>
   <p>让大模型「读论文」时，最大的风险不是总结得不好，而是<b>编造</b>：指标数字、实验设置、数据集名称都可能是幻觉。论文领航把「读」变成一连串可审计的工具调用——模型写的每一句依据都能被机械验证，验证不通过就写不进笔记。</p>
 
@@ -43,7 +50,7 @@
 pnpm dsh web --patch /绝对路径/plugin/cordis.yml
 # 打开 http://127.0.0.1:3080 ，对话输入：
 阅读 arXiv:1706.03762，按 paper 技能产出笔记</code></pre>
-  <p>完整步骤（含依赖安装与评测复跑）见<a href="run.html">运行页</a>。</p>
+  <p>完整步骤见<a href="run.html">运行页</a>。插件新会话暂定调用智谱 <b>GLM-5.3-Flash</b>。已发表评测仍是 DeepSeek-V4.1-Flash，选型见<a href="models.html">模型页</a>。</p>
 
   <footer>厦门大学信息学院 · 学科实践三期末项目 · Harness commit <code>2e39e704</code> · 2026-11</footer>
 </main>

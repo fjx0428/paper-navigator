@@ -3,6 +3,7 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import { noteToMarkdown } from '../noteRender.ts'
 import { validateNoteShape } from '../noteSchema.ts'
 import { checkQuotes, normalizeWs } from '../quoteCheck.ts'
+import { locateQuote } from '../locate.ts'
 import { NOTES_DIR, paperStore } from '../store.ts'
 import { traceTool } from '../trace.ts'
 
@@ -79,6 +80,11 @@ export const writeNoteTool = defineTool({
       authors: record.authors,
       pageCount: record.pageCount,
       generatedAt: new Date(),
+      locate: (q) => {
+        const loc = locateQuote(q, record)
+        if (!loc) return undefined
+        return loc.section === '摘要' ? '摘要' : `${loc.section}，${loc.pages}`
+      },
     })
     const { mkdir, writeFile } = await import('node:fs/promises')
     const { join } = await import('node:path')
@@ -91,7 +97,7 @@ export const writeNoteTool = defineTool({
 
     const quoteCount = countQuotes(note)
     await traceTool({ tool: 'write_note', arxivId: note.arxiv_id, ok: true, size: quoteCount, detail: path })
-    return `[write_note] 笔记已写入 ${path}；${quoteCount} 条引用全部命中原文。可以向用户总结这篇论文了。`
+    return `[write_note] 笔记已写入 ${path}；${quoteCount} 条引用全部命中原文。对照阅读（左 PDF、右笔记，含结构图）：site/read.html?id=${safe}。可以向用户总结这篇论文了。`
   },
 })
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型 · 论文领航</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="architecture.html">架构</a>
+    <a href="demo.html">演示</a>
+    <a href="survey.html">调研</a>
+    <a href="read.html">阅读</a>
+    <a href="models.html" class="active">模型</a>
+    <a href="notes/index.html">笔记</a>
+    <a href="eval.html">评测</a>
+    <a href="run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>模型怎么选</h1>
+  <p class="lead">插件新会话暂定调用智谱 GLM-5.3-Flash（思考等级 high）。已发表的 8 篇评测仍是 DeepSeek-V4.1-Flash，两套数字不要放在一起比。密钥在环境变量 <code>ZHIPU_API_KEY</code>，不进仓库。下面只列这把钥匙实际能调用、并且适合「读论文 + 调工具」的型号。价格是智谱开放平台 2026-11 的按量单价，单位是元 / 百万 tokens。</p>
+
+  <div class="card pick">
+    <b>日常用 GLM-5.3-Flash</b><span class="tag">推荐</span>
+    <p>输入 0.8、输出 2.8，上下文 100 万。同一把钥匙上已经验证能完成工具调用。一篇论文来回读十几次章节，费用大约是旗舰的十分之一，上下文也盖得住 144 页综述。答辩如果只现场跑一篇、希望工具遵循更稳，再换成 GLM-5.3。</p>
+  </div>
+
+  <h2>这把钥匙里值得用的四个</h2>
+  <div class="table-scroll"><table>
+    <tr><th>模型</th><th>什么时候用</th><th>上下文</th><th>输入 / 输出</th></tr>
+    <tr><td><b>glm-5.3-flash</b></td><td>反复读论文、复跑、改提示。默认就切这个</td><td>1M</td><td>0.8 / 2.8</td></tr>
+    <tr><td><b>glm-5.3</b></td><td>答辩现场单篇。长程工具调用更稳，不要拿来跑满 8 篇加对照组</td><td>1M</td><td>8 / 28</td></tr>
+    <tr><td>glm-5.3-flashx</td><td>同一能力想要更低延迟。单价是 Flash 的约 2.5 倍</td><td>1M</td><td>2 / 7</td></tr>
+    <tr><td>glm-4.7</td><td>上一代通用模型。上下文 20 万，够普通论文，比 5.3 便宜</td><td>200K</td><td>短输出约 2 / 8，长输出约 3 / 14</td></tr>
+  </table></div>
+
+  <h2>同一把钥匙里先不用的</h2>
+  <div class="card">
+    <p>账号模型列表里还有 glm-5、glm-5.1、glm-5.2、glm-5-turbo、glm-4.6、glm-4.5、glm-4.5-air。它们要么被 5.3 按相近价格盖过，要么上下文更短。glm-5.3-flashx-legal 是法律场景，和读 arXiv 无关。免费的 GLM-4.7-Flash 不在这把钥匙的可用列表里，调用返回的是「访问量过大」，不要写进演示。</p>
+    <p>图像、语音、视频、向量模型都不进这个插件。论文文本走 PDF 抽取，不把版面交给视觉模型。</p>
+  </div>
+
+  <h2>和 DeepSeek Flash 怎么分工</h2>
+  <div class="table-scroll"><table>
+    <tr><th></th><th>DeepSeek-V4.1-Flash</th><th>GLM-5.3-Flash</th><th>GLM-5.3</th></tr>
+    <tr><td>现在的角色</td><td>评测表、演示脚本、PPT 上的数字</td><td>接上之后的日常默认</td><td>单篇冲质量</td></tr>
+    <tr><td>思考</td><td>评测时用 High</td><td>切换脚本设为 high；思考会计入输出额度</td><td>同左，单次输出上限配到 16384，避免想完没字</td></tr>
+    <tr><td>不要混着讲</td><td colspan="3">换模型之后的笔记不能和现在这张 158/158 的表放在一起比。要新数字，就整表重跑。</td></tr>
+  </table></div>
+
+  <h2>切换</h2>
+  <p>改的是 web 和 headless 两个 profile 里「新会话」的默认模型。已经打开的网页要停掉再启动。</p>
+<pre><code>node scripts/use-model.mjs                 # 看当前默认
+node scripts/use-model.mjs glm-5.3-flash   # 日常
+node scripts/use-model.mjs glm-5.3         # 答辩单篇
+node scripts/use-model.mjs deepseek-flash  # 回到评测用的模型</code></pre>
+  <p>智谱这条路由做了三处兼容：系统提示继续用 <code>system</code> 角色（智谱拒绝 <code>developer</code>）、输出上限字段用 <code>max_tokens</code>、思考开关用和 DeepSeek 相同的 <code>thinking.type</code>。模型列表写在 <code>config/zhipu.patch.yml</code>，密钥只出现在本机环境变量和被 git 忽略的 <code>.env</code>。</p>
+
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · Harness commit <code>2e39e704</code> · 2026-11</footer>
+</main>
+</body>
+</html>

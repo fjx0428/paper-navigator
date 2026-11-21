@@ -13,53 +13,61 @@
     <a href="index.html">首页</a>
     <a href="architecture.html">架构</a>
     <a href="demo.html">演示</a>
+    <a href="notes/index.html">笔记</a>
+    <a href="survey.html">调研</a>
+    <a href="read.html">阅读</a>
+    <a href="models.html">模型</a>
     <a href="eval.html" class="active">评测</a>
     <a href="run.html">运行</a>
   </nav>
 </header>
 <main>
   <h1>评测：8 篇论文 + 摘要对照组</h1>
-  <p class="lead">插件组 = 完整四工具链 + 引用校验；对照组 = 同一批论文，只在提示里贴摘要、不提供任何工具，要求按同一笔记结构产出并给出主指标。模型 DeepSeek-V4.1-Flash，2026-11-21 14:12 运行。复跑命令见<a href="run.html">运行页</a>。</p>
+  <p class="lead">插件组 = 完整四工具链 + 引用校验；对照组 = 同一批论文，只在提示里贴摘要、不提供任何工具，要求按同一笔记结构产出并给出主指标。模型 DeepSeek-V4.1-Flash，2026-11-21 16:55 运行。复跑命令见<a href="run.html">运行页</a>。</p>
 
   <h2>汇总对比</h2>
-  <table>
+  <div class="table-scroll"><table>
     <tr><th>指标</th><th>插件组（四工具 + 校验）</th><th>摘要对照组（无工具）</th></tr>
     <tr><td>笔记六字段完整</td><td>8/8</td><td>8/8</td></tr>
     <tr><td>引用逐字命中率</td><td><b>100%</b>（158/158）</td><td>96%（78/81）</td></tr>
-    <tr><td>事实关键记号命中</td><td>78%</td><td>57%</td></tr>
+    <tr><td>事实关键记号命中</td><td>79%</td><td>57%</td></tr>
     <tr><td>平均工具调用次数</td><td>11.3 次/篇</td><td>0（无工具）</td></tr>
-  </table>
+  </table></div>
+
+  <h2>逐篇对比</h2>
+  <div class="chart-wrap"><h3>引用逐字命中率（%）</h3><div class="chart-legend"><span><span class="swatch" style="background:#4D6BFE"></span>插件组</span><span><span class="swatch" style="background:#5a6478"></span>摘要对照组</span></div><svg viewBox="0 0 590 174" width="100%" role="img"><rect x="30" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="54" y="0" width="16" height="150" rx="3" fill="#5a6478"><title>对照组 100%</title></rect><text x="50" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="50" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">1706.03762</text><rect x="100" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="124" y="0" width="16" height="150" rx="3" fill="#5a6478"><title>对照组 100%</title></rect><text x="120" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="120" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">1810.04805</text><rect x="170" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="194" y="49.5" width="16" height="100.5" rx="3" fill="#5a6478"><title>对照组 67%</title></rect><text x="190" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="190" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">1706.06978</text><rect x="240" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="264" y="0" width="16" height="150" rx="3" fill="#5a6478"><title>对照组 100%</title></rect><text x="260" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="260" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2005.11401</text><rect x="310" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="334" y="0" width="16" height="150" rx="3" fill="#5a6478"><title>对照组 100%</title></rect><text x="330" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="330" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2106.09685</text><rect x="380" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="404" y="0" width="16" height="150" rx="3" fill="#5a6478"><title>对照组 100%</title></rect><text x="400" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="400" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2210.03629</text><rect x="450" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="474" y="0" width="16" height="150" rx="3" fill="#5a6478"><title>对照组 100%</title></rect><text x="470" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="470" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2605.23717</text><rect x="520" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="544" y="0" width="16" height="150" rx="3" fill="#5a6478"><title>对照组 100%</title></rect><text x="540" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="540" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2610.03924</text></svg></div>
+  <div class="chart-wrap"><h3>事实关键记号命中（%）</h3><div class="chart-legend"><span><span class="swatch" style="background:#4D6BFE"></span>插件组</span><span><span class="swatch" style="background:#5a6478"></span>摘要对照组</span></div><svg viewBox="0 0 590 174" width="100%" role="img"><rect x="30" y="0" width="16" height="150" rx="3" fill="#4D6BFE"><title>插件组 100%</title></rect><rect x="54" y="27.000000000000014" width="16" height="122.99999999999999" rx="3" fill="#5a6478"><title>对照组 82%</title></rect><text x="50" y="-6" font-size="10" fill="#9aa3b2" text-anchor="middle">100</text><text x="50" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">1706.03762</text><rect x="100" y="40.5" width="16" height="109.5" rx="3" fill="#4D6BFE"><title>插件组 73%</title></rect><rect x="124" y="60" width="16" height="90" rx="3" fill="#5a6478"><title>对照组 60%</title></rect><text x="120" y="34.5" font-size="10" fill="#9aa3b2" text-anchor="middle">73</text><text x="120" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">1810.04805</text><rect x="170" y="40.5" width="16" height="109.5" rx="3" fill="#4D6BFE"><title>插件组 73%</title></rect><rect x="194" y="90" width="16" height="60" rx="3" fill="#5a6478"><title>对照组 40%</title></rect><text x="190" y="34.5" font-size="10" fill="#9aa3b2" text-anchor="middle">73</text><text x="190" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">1706.06978</text><rect x="240" y="16.5" width="16" height="133.5" rx="3" fill="#4D6BFE"><title>插件组 89%</title></rect><rect x="264" y="39" width="16" height="111" rx="3" fill="#5a6478"><title>对照组 74%</title></rect><text x="260" y="10.5" font-size="10" fill="#9aa3b2" text-anchor="middle">89</text><text x="260" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2005.11401</text><rect x="310" y="27.000000000000014" width="16" height="122.99999999999999" rx="3" fill="#4D6BFE"><title>插件组 82%</title></rect><rect x="334" y="109.5" width="16" height="40.5" rx="3" fill="#5a6478"><title>对照组 27%</title></rect><text x="330" y="21.000000000000014" font-size="10" fill="#9aa3b2" text-anchor="middle">82</text><text x="330" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2106.09685</text><rect x="380" y="43.5" width="16" height="106.5" rx="3" fill="#4D6BFE"><title>插件组 71%</title></rect><rect x="404" y="43.5" width="16" height="106.5" rx="3" fill="#5a6478"><title>对照组 71%</title></rect><text x="400" y="37.5" font-size="10" fill="#9aa3b2" text-anchor="middle">71</text><text x="400" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2210.03629</text><rect x="450" y="19.5" width="16" height="130.5" rx="3" fill="#4D6BFE"><title>插件组 87%</title></rect><rect x="474" y="45" width="16" height="105" rx="3" fill="#5a6478"><title>对照组 70%</title></rect><text x="470" y="13.5" font-size="10" fill="#9aa3b2" text-anchor="middle">87</text><text x="470" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2605.23717</text><rect x="520" y="49.5" width="16" height="100.5" rx="3" fill="#4D6BFE"><title>插件组 67%</title></rect><rect x="544" y="78" width="16" height="72" rx="3" fill="#5a6478"><title>对照组 48%</title></rect><text x="540" y="43.5" font-size="10" fill="#9aa3b2" text-anchor="middle">67</text><text x="540" y="164" font-size="10" fill="#9aa3b2" text-anchor="middle">2610.03924</text></svg></div>
 
   <h2>插件组明细</h2>
-  <table>
+  <div class="table-scroll"><table>
 <tr><th>arXiv</th><th>论文</th><th>笔记完整</th><th>引用命中</th><th>工具成功/次数</th><th>事实记号</th></tr>
 <tr><td><a href="https://arxiv.org/abs/1706.03762">1706.03762</a></td><td>Attention Is All You Need</td><td><span class="ok">✅</span></td><td>18/18（100%）</td><td>11/11</td><td>11/11</td></tr>
 <tr><td><a href="https://arxiv.org/abs/1810.04805">1810.04805</a></td><td>BERT: Pre-training of Deep Bidirectional…</td><td><span class="ok">✅</span></td><td>25/25（100%）</td><td>7/8</td><td>11/15</td></tr>
 <tr><td><a href="https://arxiv.org/abs/1706.06978">1706.06978</a></td><td>Deep Interest Network for Click-Through …</td><td><span class="ok">✅</span></td><td>18/18（100%）</td><td>9/10</td><td>22/30</td></tr>
 <tr><td><a href="https://arxiv.org/abs/2005.11401">2005.11401</a></td><td>Retrieval-Augmented Generation for Knowl…</td><td><span class="ok">✅</span></td><td>21/21（100%）</td><td>9/9</td><td>17/19</td></tr>
-<tr><td><a href="https://arxiv.org/abs/2106.09685">2106.09685</a></td><td>LoRA: Low-Rank Adaptation of Large Langu…</td><td><span class="ok">✅</span></td><td>21/21（100%）</td><td>12/13</td><td>8/11</td></tr>
+<tr><td><a href="https://arxiv.org/abs/2106.09685">2106.09685</a></td><td>LoRA: Low-Rank Adaptation of Large Langu…</td><td><span class="ok">✅</span></td><td>21/21（100%）</td><td>12/13</td><td>9/11</td></tr>
 <tr><td><a href="https://arxiv.org/abs/2210.03629">2210.03629</a></td><td>ReAct: Synergizing Reasoning and Acting …</td><td><span class="ok">✅</span></td><td>20/20（100%）</td><td>11/12</td><td>10/14</td></tr>
 <tr><td><a href="https://arxiv.org/abs/2605.23717">2605.23717</a></td><td>Vision-Based Agile Landing on Turbulent …</td><td><span class="ok">✅</span></td><td>17/17（100%）</td><td>13/15</td><td>20/23</td></tr>
 <tr><td><a href="https://arxiv.org/abs/2610.03924">2610.03924</a></td><td>Barrier-Shaped Recurrent Reinforcement L…</td><td><span class="ok">✅</span></td><td>18/18（100%）</td><td>10/12</td><td>18/27</td></tr>
-</table>
+</table></div>
 
   <h2>摘要对照组明细</h2>
-  <table>
+  <div class="table-scroll"><table>
 <tr><th>arXiv</th><th>论文</th><th>笔记完整</th><th>引用命中</th><th>工具成功/次数</th><th>事实记号</th></tr>
 <tr><td><a href="https://arxiv.org/abs/1706.03762">1706.03762</a></td><td>Attention Is All You Need</td><td><span class="ok">✅</span></td><td>10/10（100%）</td><td>—</td><td>9/11</td></tr>
 <tr><td><a href="https://arxiv.org/abs/1810.04805">1810.04805</a></td><td>BERT: Pre-training of Deep Bidirectional…</td><td><span class="ok">✅</span></td><td>8/8（100%）</td><td>—</td><td>9/15</td></tr>
 <tr><td><a href="https://arxiv.org/abs/1706.06978">1706.06978</a></td><td>Deep Interest Network for Click-Through …</td><td><span class="ok">✅</span></td><td>6/9（67%）</td><td>—</td><td>12/30</td></tr>
 <tr><td><a href="https://arxiv.org/abs/2005.11401">2005.11401</a></td><td>Retrieval-Augmented Generation for Knowl…</td><td><span class="ok">✅</span></td><td>11/11（100%）</td><td>—</td><td>14/19</td></tr>
-<tr><td><a href="https://arxiv.org/abs/2106.09685">2106.09685</a></td><td>LoRA: Low-Rank Adaptation of Large Langu…</td><td><span class="ok">✅</span></td><td>8/8（100%）</td><td>—</td><td>2/11</td></tr>
+<tr><td><a href="https://arxiv.org/abs/2106.09685">2106.09685</a></td><td>LoRA: Low-Rank Adaptation of Large Langu…</td><td><span class="ok">✅</span></td><td>8/8（100%）</td><td>—</td><td>3/11</td></tr>
 <tr><td><a href="https://arxiv.org/abs/2210.03629">2210.03629</a></td><td>ReAct: Synergizing Reasoning and Acting …</td><td><span class="ok">✅</span></td><td>11/11（100%）</td><td>—</td><td>10/14</td></tr>
 <tr><td><a href="https://arxiv.org/abs/2605.23717">2605.23717</a></td><td>Vision-Based Agile Landing on Turbulent …</td><td><span class="ok">✅</span></td><td>11/11（100%）</td><td>—</td><td>16/23</td></tr>
 <tr><td><a href="https://arxiv.org/abs/2610.03924">2610.03924</a></td><td>Barrier-Shaped Recurrent Reinforcement L…</td><td><span class="ok">✅</span></td><td>13/13（100%）</td><td>—</td><td>13/27</td></tr>
-</table>
+</table></div>
 
   <h2>口径说明</h2>
   <div class="card">
     <b>引用逐字命中</b>：笔记里每条 quote 与离线抽取的论文全文（与插件同一套 PDF 抽取代码）做「仅合并空白后逐字包含」比对。写入时 <code>write_note</code> 已挡过一次，此处是对最终落盘内容的独立复核。<br><br>
-    <b>事实关键记号</b>：自动从每篇 3 个标准事实（<code>eval/papers.jsonl</code>）抽出关键记号（数字、方法名、数据集名），检查是否出现在笔记 JSON 中。这是近似核对，单篇记号未命中不等于事实错误，人工复核记录见 <code>eval/results.md</code>。<br><br>
+    <b>事实关键记号</b>：自动从每篇 3 个标准事实（<code>eval/papers.jsonl</code>）抽出关键记号（数字、方法名、数据集名），检查是否出现在笔记 JSON 中。比对前会去掉数字里的千分位逗号。这是近似核对，单篇记号未命中不等于事实错误。<br><br>
     <b>工具调用统计</b>来自插件轨迹 <code>eval/traces/tool-calls.jsonl</code>（每次调用一行 JSONL）。对照组按实验设计不给工具，记 0。
   </div>
 

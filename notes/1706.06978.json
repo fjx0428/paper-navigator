@@ -1,76 +1,50 @@
 {
   "arxiv_id": "1706.06978",
-  "data": {
+  "title": "Deep Interest Network for Click-Through Rate Prediction",
+  "problem": {
+    "text": "CTR 预估是工业级在线广告的核心任务。主流深度模型遵循 Embedding&MLP 范式，把用户行为特征池化成一个与候选广告无关的定长向量，难以表达用户多样的兴趣。作者指出这种定长表示是瓶颈，希望让用户兴趣表示随候选广告自适应变化。",
     "quotes": [
-      "Experiments on two public datasets as well as an Alibaba real production dataset with over 2 billion samples",
-      "more relevant to online performance in display advertising system."
-    ],
-    "text": "实验使用两个公开数据集（Amazon Electronics 与 MovieLens）以及阿里巴巴展示广告生产日志，其中 Alibaba 训练集约 2 billion 样本、测试集 0.14 billion 样本。指标为按用户展示量加权的 user-weighted AUC（论文仍简称 AUC），并以相对 BaseModel 的 RelaImpr 衡量提升。对比对象包括 LR、BaseModel、Wide&Deep、PNN、DeepFM，并在 Alibaba 数据上对 Dropout、Filter、DiFacto、MBA 等正则化与 Dice 激活函数做消融。"
-  },
-  "limitations": {
-    "quotes": [
-      "on Amazon Dataset with rich user behaviors, DIN stands out",
-      "which leads to extremely heavy computations and is unacceptable with parameters scaling up to hundreds of millions",
-      "DIN now has been deployed in the online display advertising system in Alibaba."
-    ],
-    "text": "证据以离线 AUC 为主，公开数据集上的增益有限（Amazon 5.35%、MovieLens 1.61%），且收益明显集中在行为丰富的场景，说明效果依赖历史行为的质量与规模。方法需对每个候选广告与全部历史行为逐一打分，在线时延与算力开销未被量化；正则化与 Dice 的动机也表明，工业级稀疏特征训练的开销才是主要工程约束。"
+      "The use of fixed-length vector will be a bottleneck"
+    ]
   },
   "method": {
+    "text": "提出 Deep Interest Network（DIN）：在 Embedding&MLP 基础上引入 local activation unit，针对给定候选广告对用户历史行为做软搜索并加权激活，得到随广告变化的用户兴趣表示向量。另提出两项训练技术：mini-batch aware regularization（只对本 mini-batch 出现的特征参数做正则）和数据自适应激活函数 Dice，用于训练数亿参数的工业稀疏网络。",
     "quotes": [
-      "a(·) is a feed-forward network with output as the activation weight",
-      "in which only parameters of features appearing in m-th mini-batch participate in the computation of regularization.",
-      "we develop two techniques: mini-batch aware regularization and data adaptive activation function which can help training industrial deep networks with hundreds of millions of parameters"
-    ],
-    "text": "DIN 在 BaseModel 上仅增加一个 local activation unit：以候选广告 embedding 与每条历史行为 embedding 为输入，经前馈网络输出激活权重，对行为 embedding 做加权 sum pooling，得到随广告变化的用户兴趣表示。为训练上亿参数的稀疏特征网络，论文提出 mini-batch aware 正则化（只对当前 batch 中出现的特征参数计算 L2 惩罚）和数据自适应激活函数 Dice（用 batch 内均值方差自适应调整整流点）。"
+      "Deep Interest Network (DIN) which tackles this challenge by designing a local activation unit to adaptively learn the representation of user interests from historical behaviors with respect to a certain ad",
+      "we develop two techniques: mini-batch aware regularization and data adaptive activation function which can help training industrial deep networks with hundreds of millions of parameters",
+      "in which only parameters of features appearing in m-th mini-batch participate in the computation of regularization"
+    ]
+  },
+  "data": {
+    "text": "实验在两个公开数据集（Amazon Electronics：192,403 用户、63,001 商品、1,689,188 样本；MovieLens：138,493 用户、27,278 电影、20,000,263 样本）和阿里线上展示广告数据（训练集约 20 亿样本、测试集约 1.4 亿）上进行。对手包括 LR、BaseModel、Wide&Deep、PNN、DeepFM，指标为按用户加权平均的 AUC 及 RelaImpr，结果为 5 次重复平均。",
+    "quotes": [
+      "contains 192,403 users, 63,001 goods,",
+      "contains 138,493 users,",
+      "is about 2 billions and 0.14 billion"
+    ]
   },
   "metrics": [
     {
-      "name": "Amazon Electronics AUC (DIN)",
-      "quote": "DIN 0.7337 1.61% 0.8818 5.35%",
-      "value": "0.8818"
+      "name": "DIN AUC（Amazon Electronics）",
+      "value": "0.8818（DIN+Dice 为 0.8871），较 BaseModel RelaImpr +5.35%（Dice 后 +6.82%）",
+      "quote": "DIN 0.7337 1.61% 0.8818 5.35%"
     },
     {
-      "name": "Amazon Electronics RelaImpr (DIN)",
-      "quote": "DIN 0.7337 1.61% 0.8818 5.35%",
-      "value": "5.35%"
+      "name": "DIN AUC（MovieLens）",
+      "value": "0.7337（DIN+Dice 为 0.7348），较 BaseModel RelaImpr +1.61%（Dice 后 +2.09%）",
+      "quote": "DIN 0.7337 1.61% 0.8818 5.35%"
     },
     {
-      "name": "Amazon Electronics AUC (DIN + Dice)",
-      "quote": "DIN with Dice0.7348 2.09% 0.8871 6.82%",
-      "value": "0.8871"
-    },
-    {
-      "name": "Amazon Electronics RelaImpr (DIN + Dice)",
-      "quote": "DIN with Dice0.7348 2.09% 0.8871 6.82%",
-      "value": "6.82%"
-    },
-    {
-      "name": "Alibaba AUC (DIN with MBA Reg. and Dice)",
-      "quote": "DIN with MBA Reg. and Dice 0.6083 11.65%",
-      "value": "0.6083"
-    },
-    {
-      "name": "Alibaba RelaImpr (DIN with MBA Reg. and Dice)",
-      "quote": "DIN with MBA Reg. and Dice 0.6083 11.65%",
-      "value": "11.65%"
-    },
-    {
-      "name": "Alibaba AUC (DIN alone)",
-      "quote": "DIN Model 0.6029 6.08%",
-      "value": "0.6029"
-    },
-    {
-      "name": "Alibaba AUC (BaseModel with MBA Reg.)",
-      "quote": "With goods_ids feature and MBA. Reg. 0.6031 9.68%",
-      "value": "0.6031"
+      "name": "BaseModel + MBA 正则 AUC（Alibaba）",
+      "value": "0.6031，较无 goods_ids 特征无正则基线 RelaImpr +9.68%",
+      "quote": "With goods_ids feature and MBA. Reg. 0.6031 9.68%"
     }
   ],
-  "problem": {
+  "limitations": {
+    "text": "论文未设专门局限性章节。作者承认在大规模高维稀疏特征（如 6 亿维 goods_ids）下首个 epoch 后即出现严重过拟合，需依赖所提正则与激活函数技术才能训练，说明方法对工程与正则化策略依赖较强；此外文中未讨论 local activation unit 带来的额外计算在在线服务中的开销分析。",
     "quotes": [
-      "This representation vector stays the same for a given user, in regardless of what candidate ads are.",
-      "In this way, user features are compressed into a fixed-length representation vector, in regardless of what candidate ads are."
-    ],
-    "text": "论文针对展示广告 CTR 预测中 Embedding&MLP 范式的核心缺陷：用户特征被池化为固定长度向量，且该向量与候选广告无关，因此维度受限时成为表达用户多样兴趣的瓶颈。作者指出，直接扩大 embedding 维度会带来过拟合，并显著增加计算与存储负担，对工业在线系统不可接受。"
-  },
-  "title": "Deep Interest Network for Click-Through Rate Prediction"
+      "overfitting turns to be a big challenge",
+      "occurs after the first epoch without any regularization"
+    ]
+  }
 }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoRA: Low-Rank Adaptation of Large Language Models · 论文领航笔记</title>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="notes.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="../index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../architecture.html">架构</a>
+    <a href="../demo.html">演示</a>
+    <a href="index.html" class="active">笔记</a>
+    <a href="../eval.html">评测</a>
+    <a href="../run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>LoRA: Low-Rank Adaptation of Large Language Models</h1>
+  <p class="lead">arXiv:<a href="https://arxiv.org/abs/2106.09685">2106.09685</a> · 由论文领航插件自动生成，全部引用经 write_note 逐字校验（仅合并空白）</p>
+  <section class="note-sec"><h2>问题</h2><p>大规模预训练语言模型要为每个下游任务做全量微调，每个任务都要保存并部署一份与原始模型同样大的参数副本；以 GPT-3 175B 为例，这种部署方式成本高到不可行。已有参数高效方法（adapter、prefix 类）往往引入推理延迟或缩短可用序列长度，且常常达不到全量微调的质量。作者由此假设：模型适配时的权重变化具有很低的“内在秩”，可以把任务增量压缩成小得多的参数集合。</p><h3>原文依据</h3>
+<blockquote>Using GPT-3 175B as an example -- deploying independent instances of fine-tuned models, each with 175B parameters, is prohibitively expensive.</blockquote>
+<blockquote>As we pre-train larger models, full fine-tuning, which retrains all model parameters, becomes less feasible.</blockquote>
+<blockquote>often introduce inference latency (Houlsby et al., 2019; Rebuffi et al., 2017) by extending model depth or reduce the model’s usable sequence length</blockquote></section>
+  <section class="note-sec"><h2>方法</h2><p>LoRA 冻结预训练权重 W0，把权重更新重参数化为低秩分解 ΔW=BA（B 为 d×r、A 为 r×k，r 远小于 min(d,k)），前向变成 h=W0x+BAx，只训练 A、B。A 用高斯初始化、B 置零，使训练开始时 ΔW 为零；ΔWx 再按 α/r 缩放，从而在改变 r 时减少超参数重调。推理时把 BA 显式加回 W0，任务切换只需替换低秩矩阵，因此不增加推理延迟；实验主要把 LoRA 施加于注意力的 Wq、Wv，并冻结 MLP。</p><h3>原文依据</h3>
+<blockquote>LoRA allows us to train some dense layers in a neural network indirectly by optimizing rank decomposition matrices</blockquote>
+<blockquote>In principle, we can apply LoRA to any subset of weight matrices in a neural network to reduce the number of trainable parameters.</blockquote>
+<blockquote>We limit our study to only adapting the attention weights for downstream tasks and freeze the MLP modules</blockquote></section>
+  <section class="note-sec"><h2>数据</h2><p>实验覆盖 RoBERTa base/large 与 DeBERTa XXL 的 GLUE、GPT-2 medium/large 的 E2E NLG（另含 WebNLG、DART），并扩展到 GPT-3 175B 的 WikiSQL、MultiNLI 与 SAMSum，全部在 NVIDIA Tesla V100 上训练。GPT-3 上 LoRA（4.7M 可训练参数）取得 WikiSQL 73.4、MultiNLI-m 91.7、SAMSum R1/R2/RL 53.8/29.8/45.9，与全量微调的 73.8、89.5、52.0/28.0/44.5 相当或更好。DeBERTa XXL 上 LoRA 仅用 4.7M 参数就把 GLUE 平均分做到 91.3，略高于全量微调的 91.1。</p><h3>原文依据</h3>
+<blockquote>Our experiments cover a wide range of tasks, from natural language understanding (NLU) to generation (NLG).</blockquote>
+<blockquote>We use NVIDIA Tesla V100 for all experiments.</blockquote>
+<blockquote>As shown in Table 4, LoRA matches or exceeds the fine-tuning baseline on all three datasets.</blockquote>
+<blockquote>GPT-3 (LoRA) 4.7M 73.4 91.7 53.8/29.8/45.9</blockquote></section>
+  <section class="note-sec"><h2>指标</h2>
+  <table><tr><th>指标</th><th>数值</th><th>原文依据</th></tr>
+  <tr><td>可训练参数减少倍数（GPT-3 175B）</td><td><b>10,000×</b></td><td>Compared to GPT-3 175B fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times.</td></tr>
+<tr><td>GPU 显存需求降低</td><td><b>3×</b></td><td>LoRA makes training more efficient and lowers the hardware barrier to entry by up to 3 times when using adaptive optimizers since we do not need to calculate the gradients or maintain the optimizer states for most parameters.</td></tr>
+<tr><td>GPT-3 WikiSQL 准确率（LoRA，4.7M 参数）</td><td><b>73.4%</b></td><td>GPT-3 (LoRA) 4.7M 73.4 91.7 53.8/29.8/45.9</td></tr>
+<tr><td>GPT-3 MultiNLI-m 准确率（LoRA，4.7M 参数）</td><td><b>91.7%</b></td><td>GPT-3 (LoRA) 4.7M 73.4 91.7 53.8/29.8/45.9</td></tr>
+<tr><td>DeBERTa XXL GLUE 平均分（LoRA，4.7M 参数）</td><td><b>91.3</b></td><td>DeBXXL (LoRA) 4.7M 91.9±.2 96.9±.2 92.6±.6 72.4±1.1 96.0±.1 92.9±.1 94.9±.4 93.0±.2 91.3</td></tr>
+<tr><td>GPT-3 训练吞吐（LoRA vs 全量微调，每 V100）</td><td><b>43.1 vs 32.5 tokens/s</b></td><td>For GPT-3 175B, the training throughput for full fine-tuning is 32.5 tokens/s per V100 GPU; with the same number of weight shards for model parallelism, the throughput is 43.1 tokens/s per V100 GPU for LoRA.</td></tr>
+<tr><td>100 个适配模型的总存储</td><td><b>354GB（vs 35TB）</b></td><td>storing 100 adapted models only requires 350GB + 35MB * 100 ≈ 354GB as opposed to 100 * 350GB ≈ 35TB.</td></tr>
+  </table></section>
+  <section class="note-sec"><h2>局限</h2><p>“该把 LoRA 加到哪些权重矩阵”以及秩 r 的选取仍主要依赖启发式规则，小秩并非对所有任务都成立，例如下游任务语言与预训练语言不同时，接近满秩的重训练可能更好。低秩有效性的解释主要是经验性的子空间相似度分析，微调/LoRA 起作用的内在机制仍不清楚。实验只覆盖 Transformer 的注意力权重（MLP 被冻结），并且对特殊 token 过多导致性能下降的现象明确未做深入研究。</p><h3>原文依据</h3>
+<blockquote>However, we do not expect a small r to work for every task or dataset.</blockquote>
+<blockquote>We mostly depend on heuristics to select the weight matrices to apply LoRA to.</blockquote>
+<blockquote>The mechanism behind fine-tuning or LoRA is far from clear – how are features learned during pre-training transformed to do well on downstream tasks?</blockquote>
+<blockquote>While a thorough investigation into this phenomenon is out-of-scope for this work</blockquote></section>
+  <p><a href="index.html">← 返回笔记库</a> · <a href="https://arxiv.org/pdf/2106.09685">原文 PDF ↗</a></p>
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · <a href="https://github.com/fjx0428/paper-navigator">GitHub</a> · <a href="https://paper-navigator-2m06.zai.site">在线演示说明</a></footer>
+</main>
+</body>
+</html>

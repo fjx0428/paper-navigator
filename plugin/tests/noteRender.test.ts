@@ -20,6 +20,8 @@ test('渲染出标题、链接、指标表和引用', () => {
   assert.ok(md.includes('| BLEU | 28.4 |'))
   assert.ok(md.includes('> we propose the Transformer'))
   assert.ok(md.includes('## 局限'))
+  assert.ok(md.includes('```mermaid'))
+  assert.ok(md.includes('q --> m --> d --> k --> l'))
 })
 
 test('长引用在表格里截断', () => {
