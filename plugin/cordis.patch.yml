@@ -1,0 +1,9 @@
+# 论文领航 · dsh bundle patch
+# 安装：dsh plugin --profile <name> add paper-navigator
+# 模型策略：完全跟随 DS 生态——base 组合默认 deepseek-official / deepseek-flash，
+# 用户在环境变量里配置 DEEPSEEK_API_KEY 即可。插件不自带任何模型路由，
+# 多模型（智谱 GLM 等）是宿主 llm-pi-ai 配置层的可选能力，与本插件解耦。
+
+- insert:
+    - id: paper-navigator
+      name: paper-navigator

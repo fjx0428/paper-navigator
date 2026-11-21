@@ -37,8 +37,23 @@ interface RawItem {
   width: number
 }
 
+/**
+ * pdfjs 在 Node 下走 fake worker，默认按运行时 URL 加载 pdf.worker.mjs——
+ * esbuild 打包后该文件不在 lib/ 旁，会报「worker 加载失败」。预载 worker
+ * 模块并挂到 globalThis（pdfjs 官方的 bundler 方案），加载后不再解析 URL。
+ */
+let workerReady: Promise<void> | undefined
+function ensurePdfWorker(): Promise<void> {
+  workerReady ??= (async () => {
+    const worker = await import('pdfjs-dist/legacy/build/pdf.worker.mjs')
+    ;(globalThis as unknown as { pdfjsWorker?: unknown }).pdfjsWorker = worker
+  })()
+  return workerReady
+}
+
 /** 抽取全部页面的行。抽取字符过少视为无文本层，抛错并给出明确原因。 */
 export async function extractPages(pdfPath: string): Promise<PageText[]> {
+  await ensurePdfWorker()
   const { readFile } = await import('node:fs/promises')
   const data = await readFile(pdfPath)
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs')

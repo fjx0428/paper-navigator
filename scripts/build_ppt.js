@@ -295,7 +295,7 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
   const steps = [
     ['1', '克隆 Harness（浅克隆）并锁 commit 2e39e704；pnpm install（慢网用 npmmirror）'],
     ['2', 'pnpm run build —— 约 2 分钟'],
-    ['3', '环境变量：DEEPSEEK_API_KEY（DeepSeek）或 ZAI_CODING_CN_API_KEY（智谱 GLM），双模型已验证'],
+    ['3', '环境变量：DEEPSEEK_API_KEY（完全 DS 生态）；演示中亦验证智谱 GLM 路由可插拔'],
     ['4', 'pnpm dsh web --patch /绝对路径/plugin/cordis.yml（patch 同时把默认模型切到智谱）'],
     ['5', '网页对话产出笔记；评测复跑：node --import tsx eval/run_eval.ts'],
   ]

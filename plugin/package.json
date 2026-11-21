@@ -1,11 +1,36 @@
 {
-  "name": "paper-navigator-plugin",
-  "private": true,
+  "name": "paper-navigator",
+  "version": "0.1.0",
+  "description": "论文领航：DeepSeek Harness 论文阅读插件。六个确定性工具 + paper 技能 + 引用校验，自带智谱 GLM 模型路由。",
   "type": "module",
-  "description": "论文领航：挂在 DeepSeek Harness 上的论文阅读插件。依赖用 link: 指向本地 deepseek-harness 工作区包，运行时导入从本目录向上解析。",
-  "dependencies": {
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "dsh": ">=0.2.0 <0.3.0"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "prepare": "node build.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.1.0 <5",
+    "@deepseek-ai/dsh-tools": ">=0.2.0 <0.3"
+  },
+  "devDependencies": {
     "@deepseek-ai/cordis": "link:../deepseek-harness/vendor/cordis",
     "@deepseek-ai/dsh-tools": "link:../deepseek-harness/packages/core/tools",
+    "esbuild": "0.28.1",
     "pdfjs-dist": "6.3.289"
-  }
+  },
+  "license": "MIT"
 }

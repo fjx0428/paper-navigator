@@ -30,11 +30,26 @@ pnpm run build
 pnpm dsh web --patch /Users/leiyu/学科实践大作业/plugin/cordis.yml
 ```
 
-## 插件的挂载方式（本仓库 plugin/）
+## 插件的两种安装形态（本仓库 plugin/）
 
-- `plugin/cordis.yml`：用 `- insert:` 语法 + **绝对路径** 注册插件（loader 不改变模块解析基准目录）。
-- `plugin/src/index.ts`：当前是第 1 周的挂载验证（`greet` 工具）；第 2 周起替换为四个论文工具。
-- `plugin/package.json`：依赖用 `link:` 指向本地 Harness 工作区包（`vendor/cordis`、`packages/core/tools`）。**原因**：插件目录在 Harness 仓库之外，根 node_modules 不链接 `dsh-tools` 等内部包，外部模块必须靠自己的 node_modules 向上解析。改 Harness commit 后需在 `plugin/` 重跑一次 `pnpm install`。
+### 原生形态（dsh bundle，推荐）
+
+```sh
+cd plugin && pnpm install && pnpm pack      # 产出 paper-navigator-0.1.0.tgz
+dsh plugin --profile <name> add ./paper-navigator-0.1.0.tgz
+export DEEPSEEK_API_KEY=你的key              # 模型跟随 DS 生态默认（deepseek-flash）
+```
+
+- `plugin/package.json`：`dsh.bundle` 清单 + `engines.dsh` 锁 0.2.x；dsh 内部包为 peerDependencies（与宿主共享实例）
+- `plugin/cordis.patch.yml`：bundle patch（仅插件插入行；模型路由完全跟随 DS 生态，不自带）
+- `plugin/build.mjs`：esbuild 把 src 打包成 lib/（pdfjs 内联、fake worker 预载），prepare 自包含，git 直装可用
+- 笔记默认落在**当前工作目录**的 `notes/`，可用 `PAPER_NAVIGATOR_NOTES_DIR` 覆盖
+
+### 演示形态（--patch 挂载，源码直跑）
+
+- `plugin/cordis.yml`：`- insert:` 语法 + **绝对路径**，直接加载 `src/*.ts`（tsx）
+- 模型路由：本机 profile 的 `config/zhipu.patch.yml`（智谱 GLM 演示）+ `scripts/use-model.mjs` 切换
+- `plugin/package.json` 的 devDependencies 用 `link:` 指向本地 Harness 工作区包（改 Harness commit 后在 `plugin/` 重跑 `pnpm install`）
 
 ## 评测集（eval/papers.jsonl）
 

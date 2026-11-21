@@ -50,4 +50,4 @@ export const paperStore = {
 
 /** 笔记输出目录；展示网站与答辩用。可用环境变量覆盖。 */
 export const NOTES_DIR =
-  process.env.PAPER_NAVIGATOR_NOTES_DIR ?? '/Users/leiyu/学科实践大作业/notes'
+  process.env.PAPER_NAVIGATOR_NOTES_DIR ?? 'notes'

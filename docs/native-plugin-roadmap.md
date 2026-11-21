@@ -45,6 +45,8 @@ bundle 的 `cordis.patch.yml` 三段式——**插件自己接自己的 API** �
     model: glm-5.3-flash
 ```
 
+**落地决策（2026-11-22 更新）**：实际打包选择了**完全跟随 DS 生态**——bundle patch 只保留第一段（插件插入行），模型完全由宿主决定（base 默认 `deepseek-official / deepseek-flash`，用户配 `DEEPSEEK_API_KEY`）。理由：DeepSeek 是 Harness 的第一方 provider，零额外配置；上面的「自带路由」写法保留在文档里，作为需要第三方模型时的可选增强（配置模板已验证：本机智谱演示即此形态）。
+
 要点：
 
 - bundle patch 同样按 id 覆盖 base 行，所以自带模型路由合法；用户若想换模型，在自己的 profile patch 里覆盖 `agent-default-model` 即可，不必动插件。
@@ -73,7 +75,8 @@ git 直装的 `prepare` 脚本必须自包含（不假设兄弟 monorepo）；�
 
 ## 四、验收标准（做成什么样算完成）
 
-1. 在一台**只有 Node 和 dsh** 的干净机器上：`dsh plugin add` + `export PAPER_NAVIGATOR_API_KEY` 两步后，网页/`dsh headless` 均能跑通「一句话 → 带引用校验的笔记」。
+1. 在一台**只有 Node 和 dsh** 的干净机器上：`dsh plugin add` + `export DEEPSEEK_API_KEY` 两步后，网页/`dsh headless` 均能跑通「一句话 → 带引用校验的笔记」。
+   **✅ 已达成（2026-11-22）**：tarball 安装进 headless 模板 profile，Attention 论文全流程通过（期间发现并修复 esbuild 打包后 pdfjs fake worker 的运行时 URL 解析问题——worker 预载方案写入 src/pdf.ts）。
 2. `dsh --profile demo --dump-config` 能看到 `# == paper-navigator` 独立层。
 3. 用户在自己 profile patch 覆盖 `agent-default-model` 换成 DeepSeek 后，插件功能不受影响（模型无关性的最终形态）。
 4. 发布渠道至少打通 tarball 与 git 直装其一；npm 发布可选。
