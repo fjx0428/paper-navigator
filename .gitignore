@@ -12,3 +12,7 @@ build/
 .env
 .zcode-site/
 .zcode-site.json
+
+# bundle 构建产物（git 安装路径由 prepare 自建）
+plugin/lib/
+plugin/*.tgz
