@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>演示 · 论文领航</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="architecture.html">架构</a>
+    <a href="demo.html" class="active">演示</a>
+    <a href="eval.html">评测</a>
+    <a href="run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>演示：真实运行轨迹</h1>
+  <p class="lead">以下全部来自 2026-11-21 的真实运行，工具调用逐条记录在 <code>eval/traces/tool-calls.jsonl</code>，笔记落在 <code>notes/</code>，均可复现。</p>
+
+  <h2>一、网页会话：一句话读一篇（2210.03629 · ReAct）</h2>
+  <div class="imgbox">
+    <img src="assets/demo-react.png" alt="网页会话运行结果">
+    <figcaption>输入「阅读 arXiv:2210.03629，按 paper 技能产出笔记」→ 1 轮 11 步 · 226 tok/s · 19 条引用全部命中 · 上下文仅用 3%</figcaption>
+  </div>
+
+  <h2>二、「编造的指标被退回」完整记录（2106.09685 · LoRA）</h2>
+  <p>这轮同时是一次机制演示：提示模型<b>第一次故意提交编造指标</b>。退回信息还抓到一个意外收获——一条内容真实但含 Unicode 字符差异（<code>∆</code> vs <code>Δ</code>）的引用同样被拒，展示了校验的严格度。工具轨迹（来自 jsonl，逐条原样）：</p>
+  <table>
+    <tr><th>#</th><th>工具</th><th>参数</th><th>结果</th></tr>
+    <tr><td>1–2</td><td><code>fetch_arxiv</code></td><td>2106.09685</td><td class="bad">网络抖动失败 ×2（工具内置退避重试前模型自行重试）</td></tr>
+    <tr><td>3</td><td><code>fetch_arxiv</code></td><td>2106.09685</td><td class="ok">成功：26 页</td></tr>
+    <tr><td>4</td><td><code>list_sections</code></td><td>—</td><td class="ok">10 个章节块</td></tr>
+    <tr><td>5–9</td><td><code>read_section</code></td><td>§4/§5/§5/§7/§8（max_chars 4000–12000）</td><td class="ok">共 25310 字符入语料</td></tr>
+    <tr><td>10</td><td><code>write_note</code></td><td>第 1 版笔记</td><td class="bad"><b>退回：2 条引用问题</b></td></tr>
+    <tr><td>11</td><td><code>write_note</code></td><td>修正后重交</td><td class="ok">15 条引用全部命中 → 落盘</td></tr>
+  </table>
+  <details>
+    <summary>被退回的第 1 版：工具原始返回（点击展开）</summary>
+    <div class="body">
+<pre><code>[write_note] 引用校验未通过（2 条问题），笔记未写入：
+1. metrics[0]：「The LoRA method achieves 99.9% accuracy on all
+   benchmarks」—— 在已获取的原文（摘要 + 已读章节）中找不到这句
+2. method.quotes[1]：「We use a random Gaussian initialization for A
+   and zero for B, so ∆W = BA is zero…」—— 找不到这句（∆ 字符与原文
+   Δ 不一致，合并空白救不了它）
+
+处理方式：引用必须逐字来自摘要或已读章节的返回文本（校验只合并空白
+字符）。可以先 read_section 补读相关章节，再修改后重新提交完整笔记。
+不要凭记忆写数字。</code></pre>
+    </div>
+  </details>
+  <details>
+    <summary>模型修正后的自述（点击展开）</summary>
+    <div class="body">
+      <p>被退回的引用：<code>metrics[0].quote</code> 里的编造句 "The LoRA method achieves 99.9% accuracy on all benchmarks"。修正后换成摘要原句 "LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times."；另一条换成纯 ASCII 的原句。重提后 15 条引用全部命中，笔记已写入 notes/2106.09685.md。</p>
+    </div>
+  </details>
+
+  <h2>三、长论文裁剪：144 页综述只读十分之一（2303.18223）</h2>
+  <table>
+    <tr><th>指标</th><th>数值</th></tr>
+    <tr><td>论文页数</td><td>144 页（A Survey of Large Language Models）</td></tr>
+    <tr><td>read_section 次数</td><td>13 次（模型按目录挑 §3/§11/§12/§15/§21/§28/§38 等）</td></tr>
+    <tr><td>读入正文合计</td><td><b>35,773 字符</b>（约为整篇正文的十分之一；技能上限 12000 词）</td></tr>
+    <tr><td>write_note</td><td>第 1 版退回 15 条引用问题 → 补读 4 节 → 第 2 版通过落盘</td></tr>
+  </table>
+
+  <h2>四、第 1 周挂载验证（留档）</h2>
+  <div class="imgbox">
+    <img src="assets/demo-greet.png" alt="greet 工具挂载验证">
+    <figcaption>第一个插件：greet 工具经 --patch 挂载后，在网页对话中被模型调用成功</figcaption>
+  </div>
+
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · Harness commit <code>2e39e704</code> · 2026-11</footer>
+</main>
+</body>
+</html>

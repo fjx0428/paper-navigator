@@ -1,0 +1,7 @@
+# 论文领航插件挂载配置（第 1 周）
+# 用法：在 deepseek-harness 目录下执行
+#   pnpm dsh web --patch /Users/leiyu/学科实践大作业/plugin/cordis.yml
+# 注意：loader 不改变模块解析基准目录，插件路径必须是绝对路径。
+- insert:
+    - id: paper-navigator
+      name: '/Users/leiyu/学科实践大作业/plugin/src/index.ts'

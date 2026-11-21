@@ -1,0 +1,12 @@
+# Harness 源码单独克隆，不属于本仓库内容（README 只记录其 commit）
+deepseek-harness/
+
+# 依赖与构建产物
+node_modules/
+dist/
+build/
+*.log
+
+# 系统与本地文件
+.DS_Store
+.env

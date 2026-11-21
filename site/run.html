@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>运行 · 论文领航</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="architecture.html">架构</a>
+    <a href="demo.html">演示</a>
+    <a href="eval.html">评测</a>
+    <a href="run.html" class="active">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>运行与复现</h1>
+  <p class="lead">从零到看到笔记，约 30 分钟（大部分时间在等依赖下载）。以下命令在本机（macOS arm64，Node v26.13.0）验证通过。</p>
+
+  <h2>版本锁定</h2>
+  <table>
+    <tr><th>项</th><th>值</th></tr>
+    <tr><td>Harness commit</td><td><code>2e39e70496aa02986ca6a820c5d497e816b69d7e</code>（浅克隆）</td></tr>
+    <tr><td>Harness 版本</td><td>0.2.2-rc.5</td></tr>
+    <tr><td>pnpm</td><td>11.28.x（仓库 <code>packageManager</code> 钉定）</td></tr>
+    <tr><td>模型</td><td>DeepSeek-V4.1-Flash（<code>DEEPSEEK_API_KEY</code>）</td></tr>
+  </table>
+
+  <h2>步骤</h2>
+<pre><code># 0. 准备：Node ≥ 24.9，pnpm 11，DeepSeek API Key
+npm install -g pnpm@11
+export DEEPSEEK_API_KEY="你的 Key"
+
+# 1. Harness 源码（浅克隆足够）
+git clone --depth 1 https://github.com/deepseek-ai/deepseek-harness.git
+cd deepseek-harness
+
+# 2. 依赖（npmjs 慢时用镜像；中断重跑即可续装）
+pnpm install --registry=https://registry.npmmirror.com
+
+# 3. 构建（约 2 分钟）
+pnpm run build
+
+# 4. 启动网页并挂载插件（路径换成你的仓库绝对路径）
+pnpm dsh web --patch /绝对路径/plugin/cordis.yml
+# 打开 http://127.0.0.1:3080 ，对话输入：
+#   阅读 arXiv:1706.03762，按 paper 技能产出笔记</code></pre>
+
+  <h2>关键说明</h2>
+  <div class="card">
+    <b>插件目录为什么有自己的 package.json？</b><br>
+    插件源码在本仓库 <code>plugin/</code>（不在 Harness 内）。Harness 根 node_modules 不链接 <code>@deepseek-ai/dsh-tools</code> 等内部包，所以插件目录用 <code>link:</code> 依赖指向本地 Harness 工作区包（<code>vendor/cordis</code>、<code>packages/core/tools</code>、<code>pdfjs-dist</code>）。更换 Harness commit 后，在 <code>plugin/</code> 里重跑一次 <code>pnpm install</code>。
+  </div>
+
+  <h2>复跑评测</h2>
+<pre><code># 全量 8 篇 + 摘要对照组（约 30 分钟，需要 API Key）
+node --import tsx eval/run_eval.ts
+# 渲染评测表
+node --import tsx eval/render_results.ts
+# 单元测试（17 个）
+node --import tsx --test plugin/tests/*.test.ts</code></pre>
+
+  <h2>已知问题</h2>
+  <table>
+    <tr><th>现象</th><th>原因与规避</th></tr>
+    <tr><td>web 端 <code>/paper</code> 斜杠手势报 <code>source must be a string</code></td><td>Harness 0.2.2-rc.5 对运行时注册技能的加载校验要求 source 字段。规避：对话直接说「阅读 arXiv:xxx」（技能目录会注入上下文，模型自行调用），或用 <code>dsh headless</code>。</td></tr>
+    <tr><td>arXiv 偶发 <code>fetch failed</code></td><td>本机到 arxiv.org 的连接偶发秒断。fetch_arxiv 已内置 3 次退避重试；极端情况模型会自行重试或如实报告。</td></tr>
+    <tr><td>扫描版 PDF</td><td>无文本层会被明确拒绝（本期不做 OCR），换有文本层的论文即可。</td></tr>
+  </table>
+
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · Harness commit <code>2e39e704</code> · 2026-11</footer>
+</main>
+</body>
+</html>

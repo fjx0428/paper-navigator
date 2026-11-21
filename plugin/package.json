@@ -1,0 +1,11 @@
+{
+  "name": "paper-navigator-plugin",
+  "private": true,
+  "type": "module",
+  "description": "论文领航：挂在 DeepSeek Harness 上的论文阅读插件。依赖用 link: 指向本地 deepseek-harness 工作区包，运行时导入从本目录向上解析。",
+  "dependencies": {
+    "@deepseek-ai/cordis": "link:../deepseek-harness/vendor/cordis",
+    "@deepseek-ai/dsh-tools": "link:../deepseek-harness/packages/core/tools",
+    "pdfjs-dist": "6.3.289"
+  }
+}

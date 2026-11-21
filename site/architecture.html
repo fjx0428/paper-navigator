@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架构 · 论文领航</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site">
+  <a class="logo" href="index.html">论文<span>领航</span></a>
+  <nav>
+    <a href="index.html">首页</a>
+    <a href="architecture.html" class="active">架构</a>
+    <a href="demo.html">演示</a>
+    <a href="eval.html">评测</a>
+    <a href="run.html">运行</a>
+  </nav>
+</header>
+<main>
+  <h1>架构</h1>
+  <p class="lead">插件不改 Harness 核心代码：启动时用 <code>cordis.yml</code> 插入一行配置注册工具与技能，模型在 Harness 的 Agent 循环里决定何时调用谁。</p>
+
+  <h2>一次会话的数据流</h2>
+  <div class="flow">
+    <div class="node"><b>用户</b><small>「阅读 arXiv:2210.03629」</small></div>
+    <div class="arrow">→</div>
+    <div class="node"><b>paper 技能</b><small>注入固定阅读顺序与引用规则</small></div>
+    <div class="arrow">→</div>
+    <div class="node"><b>模型（DeepSeek Flash）</b><small>决定调用哪个工具、传什么参数</small></div>
+    <div class="arrow">→</div>
+    <div class="node"><b>四个工具</b><small>确定性代码执行</small></div>
+    <div class="arrow">→</div>
+    <div class="node"><b>write_note 校验</b><small>失败退回 · 成功落盘 Markdown</small></div>
+  </div>
+
+  <h2>四个工具</h2>
+  <table>
+    <tr><th>工具</th><th>输入</th><th>返回</th></tr>
+    <tr><td><code>fetch_arxiv</code></td><td>arXiv id</td><td>标题、作者、摘要；下载 PDF 并抽取章节（内置 3 次网络重试）</td></tr>
+    <tr><td><code>list_sections</code></td><td>arXiv id</td><td>章节目录（标题、页码范围、词数）</td></tr>
+    <tr><td><code>read_section</code></td><td>章节序号、max_chars ≤ 12000</td><td>该节正文（精确按标题行切片）；返回文本进入引用校验语料</td></tr>
+    <tr><td><code>write_note</code></td><td>笔记 JSON</td><td>引用校验通过 → 写 Markdown + JSON；否则整体退回并给出逐条错误</td></tr>
+  </table>
+
+  <h2>笔记结构（字段已冻结）</h2>
+<pre><code>{
+  "arxiv_id": "2210.03629",
+  "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+  "problem":     { "text": "中文总结 2-4 句", "quotes": ["逐字英文原句"] },
+  "method":      { "text": "…", "quotes": [] },
+  "data":        { "text": "…", "quotes": [] },
+  "metrics":     [{ "name": "ALFWorld 成功率", "value": "71%", "quote": "含该数字的原句" }],
+  "limitations": { "text": "…", "quotes": [] }
+}</code></pre>
+  <p>校验规则：<code>quote</code> 与语料（摘要 + 全部 read_section 返回文本）各自只合并空白字符后，必须逐字包含；长度 ≥ 8 字符。任何一条不通过，整份笔记退回。</p>
+
+  <h2>插件如何挂进 Harness</h2>
+<pre><code># plugin/cordis.yml（patch 叠加在 dsh web 基础组合之上，零核心改动）
+- insert:
+    - id: paper-navigator
+      name: '/绝对路径/plugin/src/index.ts'</code></pre>
+  <p>插件模块 <code>inject: ['tools', 'skills']</code>，在 <code>apply(ctx)</code> 里 <code>ctx.tools.register(defineTool(...))</code> × 4、<code>ctx.skills.register({ name: 'paper', ... })</code> × 1。所有注册挂在 Cordis effect 上，卸载即反注册。</p>
+
+  <h2>Agent 循环里的角色分工</h2>
+  <div class="card">
+    <b>谁调用模型，谁执行工具？</b><br>
+    Harness 的 Driver（<code>packages/core/agent-loop</code>）驱动每一轮 turn：组装提示（工具 schema 注入系统提示）→ 调用模型流式生成 → 从输出中解析 tool-call → 并发执行 → 结果写回会话历史 → 进入下一步，直到模型不再发起调用。<b>模型只输出「调用哪个工具 + 参数」，从不亲自执行任何论文操作；工具是确定性代码，从不调用模型。</b>
+  </div>
+
+  <h2>上下文裁剪</h2>
+  <div class="card">
+    长论文不整篇进上下文：技能规定「先 list_sections 看目录，再挑与问题/方法/实验/局限相关的 2–4 节，每次 read_section ≤ 12000 字符，正文合计 ≤ 12000 词」。实测 144 页综述（约 40 万字符正文）共选读 13 次、合计 3.6 万字符——见<a href="demo.html">演示页</a>轨迹。
+  </div>
+
+  <footer>厦门大学信息学院 · 学科实践三期末项目 · Harness commit <code>2e39e704</code> · 2026-11</footer>
+</main>
+</body>
+</html>
